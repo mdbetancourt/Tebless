@@ -56,14 +56,14 @@ class Menu(Widget):
 
         self._selector = kwargs.get('selector', selector)
         self._key = kwargs.get('key', lambda x: x)
-        self._formater = kwargs.get('formater', lambda x: '  ' + x)
+        self._formater = kwargs.get('formater', lambda x: '  ' + x[:self._width-2])
         self._listen = False
         self._page = 1
         self._current = 0
         self._height = 0
 
     def listen(self):
-        if not self._is_menu or len(self.items) == 0:
+        if not self._is_menu or not self.items:
             return 1
 
         key = u''
@@ -76,19 +76,19 @@ class Menu(Widget):
             self._current = (self._current - 1) % len(self.items)
         elif key.code == self._term.KEY_ESCAPE:
             return -1
-        self._page = ceil((self._current+1)/self._limit)
         return 0
 
     def paint(self):
         """ Paint widget in the window """
         self.destroy()
+        self._page = ceil((self._current+1)/self._limit)
         term = self._term
         echo(term.move(self.y, self.x))
 
         header_height = len(self._header.split('\n')) - 1
         footer_height = len(self._footer.split('\n')) - 1
 
-        items = self.items if len(self.items) > 0 else self._empty
+        items = self.items if self.items else self._empty
         first = floor(self._current/self._limit)*self._limit
         max_page = ceil(len(items) / self._limit)
 
@@ -123,7 +123,7 @@ class Menu(Widget):
 
                 echo(tmp + '\n')
                 self._height += 1
-        
+
         ## Print footer
         if self._footer != '':
             echo(term.move_x(self.x))
@@ -132,7 +132,7 @@ class Menu(Widget):
 
     @property
     def is_listenner(self):
-        return self._is_menu and len(self.items) > 0
+        return self._is_menu and self.items
 
     @property
     def value(self):

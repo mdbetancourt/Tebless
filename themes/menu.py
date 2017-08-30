@@ -41,8 +41,8 @@ def single(window, config):
     return {
         'header': header,
         'footer': footer,
-        'formater': lambda text: f'  {for_s(text)}{l_eq}',
-        'selector': lambda text, **kw: f'  {u(for_s(text))}{l_eq}',
+        'formater': lambda text: f'  {for_s(text[:width-4])}{l_eq}',
+        'selector': lambda text, **kw: f'  {u(for_s(text[:width-4]))}{l_eq}',
     }
 
 
@@ -72,8 +72,8 @@ def double(window, config):
     return {
         'header': header,
         'footer':_footer,
-        'formater': lambda text: f'{l_eq} {text}',
-        'selector': lambda text, **kw: f'{l_eq} {u(text)}',
+        'formater': lambda text: f'{l_eq} {text[:width-8]}',
+        'selector': lambda text, **kw: f'{l_eq} {u(text[:width-8])}',
     }
 
 del theme
