@@ -4,13 +4,13 @@
 # https://opensource.org/licenses/MIT
 
 from tebless.widgets import Menu, Window
-from tebless.themes.menu import dered
+from tebless.themes.menu import single
 
 GLOBAl_STORE = {}
 
 @Window.decorator(store=GLOBAl_STORE)
 def view_menu(window):
-    theme = dered(window, {
+    theme = single(window, {
         'items': [f'Valor {x}' for x in range(100)],
     })
 

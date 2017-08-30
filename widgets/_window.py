@@ -28,8 +28,8 @@ class Window(Widget):
         parent - If you do not provider it is the main window
 
     """
-    def __init__(self, store, parent=None, **kwargs):
-        Widget.__init__(self, parent, store=store, **kwargs)
+    def __init__(self, parent=None, **kwargs):
+        Widget.__init__(self, parent, **kwargs)
         self._width, self._height = self._term.width, self._term.height
 
         self._widgets = []
@@ -77,24 +77,23 @@ class Window(Widget):
             ins_widget = widget(self, *args, **kwargs)
             self._store[name] = ins_widget
         else:
-            print(args)
             ins_widget = widget(self, *args, **kwargs)
         
         self._widgets.append(ins_widget)
         return ins_widget
 
     @staticmethod
-    def decorator(store=None):
-        def deco(func):
+    def decorator(function=None, store=None):
+        def _decorator(func):
             def wrapper(*args, **kwargs):
-                if store is not None:
-                    kwargs.update({
-                        'store': store
-                    })
                 with Window(*args, **kwargs) as win:
                     func(win)
+
             return wrapper
-        return deco
+        if function:
+            return _decorator(function)
+        return _decorator
+
     @property
     def size(self):
         """ Height and Width of window. """

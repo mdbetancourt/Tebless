@@ -8,9 +8,10 @@
 """
 import blessed
 
-__all__ = ['green', 'yellow', 'red']
+__all__ = ['green', 'yellow', 'red', 'blue']
 
 green = blessed.Terminal().green
 yellow = blessed.Terminal().yellow
 red = blessed.Terminal().red
 white = blessed.Terminal().white
+blue = blessed.Terminal().blue
