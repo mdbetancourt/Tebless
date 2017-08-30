@@ -16,8 +16,8 @@ class Widget:
         self._parent = parent
         self._cordx = round(kwargs.get('cordx', 0))
         self._cordy = round(kwargs.get('cordy', 0))
-        self._width = kwargs.get('width', 20)
-        self._height = kwargs.get('height', 0)
+        self._width = round(kwargs.get('width', 20))
+        self._height = round(kwargs.get('height', 0))
 
         if 'store' in kwargs:
             self._store = kwargs['store']

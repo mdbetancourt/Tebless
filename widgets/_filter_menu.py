@@ -22,7 +22,7 @@ class FilterMenu(Widget):
     def __init__(self, parent, s_input, s_menu, **kwargs):
         Widget.__init__(self, parent, **kwargs)
 
-        self._key = kwargs.get('key', lambda x: x)
+        self._key = kwargs.get('key', s_menu.get('key', lambda x:x))
 
         self._text = ''
         _s_menu = {
