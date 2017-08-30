@@ -45,7 +45,7 @@ class Menu(Widget):
         self._items = items or []
         self._empty = kwargs.get('empty', ['Sin elementos'])
         self._is_menu = kwargs.get('is_menu', True)
-        self._limit = kwargs.get('limit', 4)
+        self._limit = round(kwargs.get('limit', 4))
         if not 'width' in kwargs:
             self._width = parent.width
         self._header = kwargs.get('header', '')
@@ -107,7 +107,10 @@ class Menu(Widget):
 
         ## Print elements
         for idx, item in enumerate(items):
-            format_text = self._key(item).split('\n')
+            try:
+                format_text = self._key(item).split('\n')
+            except TypeError :
+                raise TypeError('Menu Widget: If the format of the elements changes and is not a str, change the empty parameter to match')
 
             for text in format_text:
                 echo(term.move_x(self.x))

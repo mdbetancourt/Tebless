@@ -48,17 +48,14 @@ class Window(Widget):
         """
         focus = 0
         listenners = [x for x in self._widgets if x.is_listenner]
-        while len(listenners) > 0:
+        while listenners:
             self.paint()
-            try:
-                res = listenners[focus].listen()
-                if focus + res < 0:
-                    break
+            res = listenners[focus].listen()
+            if focus + res < 0:
+                break
 
-                focus = (focus + res) % len(listenners)
-                
-            except TypeError as identifier:
-                print(listenners)
+            focus = (focus + res) % len(listenners)
+
 
     def add(self, widget, *args, **kwargs):
         """Insert new element.
@@ -83,9 +80,16 @@ class Window(Widget):
         return ins_widget
 
     @staticmethod
-    def decorator(function=None, store=None):
+    def decorator(function=None, **d_wargs):
         def _decorator(func):
             def wrapper(*args, **kwargs):
+                min_x = d_wargs.get('min_x', 0)
+                min_y = d_wargs.get('min_y', 0)
+                if blessed.Terminal().height < min_y:
+                    raise RuntimeError("Window height is insufficient")
+                elif blessed.Terminal().width < min_x:
+                    raise RuntimeError("Window width is insufficient")
+                    
                 with Window(*args, **kwargs) as win:
                     func(win)
 
