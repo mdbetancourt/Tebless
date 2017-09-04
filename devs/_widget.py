@@ -3,49 +3,92 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+import logging
 import blessed
+from axel import Event
+from tebless.utils import Store
+from tebless.devs import get_events
 from tebless.utils.term import echo
 
-class Widget:
-    def __init__(self, parent, **kwargs):
-        if parent is not None:
-            self._term = parent.term
-        else:
-            self._term = blessed.Terminal()
+class Widget(object):
+    """Widget BaseClass.
 
-        self._parent = parent
-        self._cordx = round(kwargs.get('cordx', 0))
-        self._cordy = round(kwargs.get('cordy', 0))
-        self._width = round(kwargs.get('width', 20))
-        self._height = round(kwargs.get('height', 0))
+    """
+    def __init__(self, cordx=0, cordy=0, width=20, height=1, **kwargs):
+        logging.debug(f"Create a {self} with id {id(self)}: params: {kwargs}")
+        self._term = blessed.Terminal()
+        self._cordx = round(cordx)
+        self._cordy = round(cordy)
+        self._width = round(width)
+        self._height = round(height)
 
-        if 'store' in kwargs:
-            self._store = kwargs['store']
-        else:
-            self._store = parent.store
+        self._parent = kwargs.get('parent', None)
+        self._store = kwargs.get('store', Store())
+        self.ref = kwargs.get('ref', None)
+        def debug(*_):
+            """ changes debug """
+            logging.debug(f"{self} changes values: {self.__dict__}")
 
-        # Events
-        self._on_enter = kwargs.get('on_enter', lambda *arg: 1)
-        self._on_change = kwargs.get('on_change', lambda *arg: 1)
-        self._on_select = kwargs.get('on_select', lambda *arg: 1)
+        self.on_change = Event(self, threads=1)
+        self.on_change += debug
+        self.on_change += self.destroy
+        self.on_change += self.paint
+        self.on_enter = Event(self, threads=1)
+        self.on_key_arrow = Event(self, threads=1)
+        self.on_exit = Event(self, threads=1)
+        self.on_key = Event(self, threads=1)
 
+        events = get_events(kwargs)
+        logging.debug(f"{self} events: {events}")
+        for key, event in events.items():
+            if (isinstance(event, Event) and event.count() > 0) or not isinstance(event, Event):
+                if key == 'on_enter':
+                    self.on_enter += event
+                elif key == 'on_key_arrow':
+                    self.on_key_arrow += event
+                elif key == 'on_exit':
+                    self.on_exit += event
+                elif key == 'on_key':
+                    self.on_key += event
+                elif key == 'on_change':
+                    self.on_change += event
 
-    def paint(self):
+    def paint(self, *_):
         """ Print widget in the window """
-        pass
-
-    def destroy(self):
+        pos = 'x: {self.x}, y: {self.y}, h: {self.height}, w: {self.width}'
+        logging.debug(f"Painted {self} with {id(self)} {pos}")
+        self._paint()
+    def destroy(self, *_):
         """ Destroy widget in the window """
-        for y in range(self.y, self.y + self.height):
-            echo(self._term.move(y, self.x) + ' ' * self.width)
+        pos = 'x: {self.x}, y: {self.y}, h: {self.height}, w: {self.width}'
+        logging.debug(f"Destroy {self} with {id(self)} {pos}")
+        self._destroy()
 
-    @property
-    def parent(self):
-        return self._parent
+    def _paint(self):
+        raise NotImplementedError
+    def _destroy(self):
+        for y_val in range(self.y, self.y + self.height):
+            echo(self._term.move(y_val, self.x) + (' ' * (self.width+1)))
 
     @property
     def term(self):
         return self._term
+
+    @property
+    def parent(self):
+        return self._parent
+    
+    @parent.setter
+    def parent(self, value):
+        self._parent = value
+
+    @property
+    def store(self):
+        return self._store
+
+    @store.setter
+    def store(self, value):
+        self._store = value
 
     @property
     def x(self):
@@ -56,15 +99,6 @@ class Widget:
         return self._cordy
 
     @property
-    def store(self):
-        """ Global store. """
-        return self._store
-
-    @property
-    def is_listenner(self):
-        return hasattr(self, 'listen')
-
-    @property
     def height(self):
         """ Height of window. """
         return self._height
@@ -73,6 +107,6 @@ class Widget:
     def width(self):
         """ Width of window. """
         return self._width
-    @property
-    def value(self):
-        return self.__str__()
+
+    def __str__(self):
+        return self.__class__.__name__

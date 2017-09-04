@@ -14,19 +14,19 @@
 
 
 __all__ = ['FilterMenu']
-
+from axel import Event
 from tebless.devs import Widget
 from tebless.widgets import Input, Menu
 
 class FilterMenu(Widget):
-    def __init__(self, parent, s_input, s_menu, **kwargs):
-        Widget.__init__(self, parent, **kwargs)
-
-        self._key = kwargs.get('key', s_menu.get('key', lambda x:x))
-
+    def __init__(self, s_input, s_menu, *args, **kwargs):
+        Widget.__init__(self, *args, **kwargs)
+        self._key = kwargs.get('key', s_menu.get('key', lambda x: x))
         self._text = ''
+        self.on_select = Event(self)
+
         _s_menu = {
-            'on_enter': self._on_sel
+            'on_enter': self.on_select
         }
         _s_input = {
             'on_change': self._on_change_input
@@ -35,28 +35,23 @@ class FilterMenu(Widget):
         _s_menu.update(s_menu)
         _s_input.update(s_input)
 
-
-        self._input = parent.add(Input, **_s_input)
-        self._menu = parent.add(Menu, **_s_menu)
-
+        self._input = Input(**_s_input)
+        self._menu = Menu(**_s_menu)
         self._items = list(self._menu.items)
 
-    def _on_change_input(self, obj_e):
+        self.on_key += self._input.on_key
+        self.on_key_arrow += self._menu.on_key_arrow
+
+    def _on_change_input(self, *_):
         text = self._input.value.lower()
         items = self._items
-
         item_filter = filter(lambda x: text in self._key(x).lower(), items)
         self._menu.items = item_filter
 
-
-    def _on_sel(self, _):
-        self._on_select(self._input, self._menu)
-        print('e')
-
-    def paint(self):
+    def _paint(self):
         self._menu.paint()
         self._input.paint()
 
-    def destroy(self):
+    def _destroy(self):
         self._input.destroy()
         self._menu.destroy()

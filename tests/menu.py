@@ -3,31 +3,39 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-from tebless.widgets import Menu, Window
-from tebless.themes.menu import single
+from tebless.devs import Debug
+from tebless.utils import Store
+from tebless.themes.menu import double
+from tebless.widgets import Menu, Window, Label
 
-GLOBAl_STORE = {}
+store = Store()
 
-@Window.decorator(store=GLOBAl_STORE)
+@Window.decorator(store=store)
 def view_menu(window):
-    theme = single(window, {
+    theme = double(window, {
         'items': [f'Valor {x}' for x in range(100)],
     })
 
-    window.add(Menu, **theme)
+    window += Menu(**theme)
 
-@Window.decorator(store=GLOBAl_STORE)
+@Window.decorator(store=store)
 def view_single_menu(window):
-    window.add(Menu, **{
-        'items': [f'Valor {x}' for x in range(100)],
-        'limit': 8,
-        'header': 'Menu',
-        'footer': 'Pagina {page} de {last}'
-    })
+    def update_label(sender, *args):
+        sender.store.label.value = sender.value
+
+    window += Menu(
+        items=[f'Valor {x}' for x in range(110)],
+        limit=8,
+        header='Menu',
+        footer='Pagina {page} de {last}',
+        on_change=update_label
+    )
+    window += Label(ref='label', cordy=10, text='mundo')
 
 def main():
     view_menu()
     view_single_menu()
 
 if __name__ == '__main__':
-    main()
+    with Debug(__file__):
+        main()

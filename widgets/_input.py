@@ -15,62 +15,66 @@ __all__ = ['Input']
 
 import re
 from tebless.devs import Widget
-
 from tebless.utils.term import echo
+from tebless.utils.styles import ljust
+from tebless.utils.term import extract_styles
+from tebless.utils.constants import BACKSPACE, DEL
 
 class Input(Widget):
-    """ Input widget with label  """
-    def __init__(self, parent, **kwargs):
-        Widget.__init__(self, parent, **kwargs)
+    """Input widget with label.
 
-        self._label = kwargs.get('label', '')
-        self._max_len = round(kwargs.get('max_len', 6))
-        self._text = kwargs.get('text', '')
+    Params:
+        text: str -- placeholder text
+        label: str -- Desc of input
+        align: styles -- center, ljust, rjust text
+        fill_c: str -- blank space
+        cursor: str -- pointer
+        left_l: str -- left terminator
+        right_l: str -- right terminator
+        max_len: int -- max string lenght
+        validation: regex -- a regex string to validate input
+        text_style: func -- apply to text
 
-        if len(self._text) > self._max_len:
-            raise ValueError('text is too long')
+    """
+    def __init__(self, text='', label='', max_len=6, *args, **kwargs):
+        Widget.__init__(self, *args, **kwargs)
 
-        self._text_style = kwargs.get('text_style', lambda x: x)
-        self._validation = kwargs.get('validation', r'.')
-        self._left_l = kwargs.get('left_l', ' [ ')
-        self._right_l = kwargs.get('right_l', ' ]')
+        self._text = text
+        self._label = label
+        self._max_len = round(max_len)
+        self._align = kwargs.get('align', ljust)
         self._fill_c = kwargs.get('fill_c', '_')
         self._cursor = kwargs.get('cursor', '_')
 
-        align = kwargs.get('align', 'left')
+        self._left_l = kwargs.get('left_l', ' [ ')
+        self._right_l = kwargs.get('right_l', ' ]')
+        self._validation = kwargs.get('validation', r'.')
+        self._text_style = kwargs.get('text_style', lambda x: x)
 
-        if align == 'center':
-            self._align = self._term.center
-        elif align == 'right':
-            self._align = self._term.rjust
-        elif align == 'left':
-            self._align = self._term.ljust
-        else:
-            raise ValueError(f'No existe {align}')
 
-    def listen(self):
-        delete_keys = (self._term.KEY_BACKSPACE, self._term.KEY_DELETE)
-        
-        key = self._term.inkey(timeout=0.2)
-        if key.isprintable() and len(self._text) < self._max_len and key != '':
-            if re.match(self._validation, key) is not None:
-                self._text += key
-                self._on_change(self)
+        if len(self._text) > self._max_len:
+            raise ValueError('text is too long')
+        elif len(extract_styles(self._fill_c)) > 1:
+            raise ValueError('fill_c need a char')
+        elif len(extract_styles(self._cursor)) > 1:
+            raise ValueError('cursor need a char')
 
-        elif key.code in delete_keys and len(self._text) > 0:
-            self._text = self._text[:-1]
-            self._on_change(self)      
-        elif key.code == self._term.KEY_ESCAPE or key == chr(3):
-            return -1
-        elif key.code == self._term.KEY_ENTER:
-            return self._on_enter(self) or 1
-        return 0
+        self.on_key += self._on_key
 
-    def paint(self):
-        """ Print widget in the window """
+    def _on_key(self, *_, **kwargs):
+        key = kwargs.get('key')
+        correct_len = len(self.value) < self._max_len
+        validations = re.match(self._validation, key) and key.isprintable()
+
+        if correct_len and validations:
+            self.value += key
+        elif key.code in (BACKSPACE, DEL) and self.value:
+            self.value = self.value[:-1]
+
+    def _paint(self):
         term = self._term
-        text = self._text_style(self._text)
-        if len(self._text) < self._max_len:
+        text = self._text_style(self.value)
+        if len(self.value) < self._max_len:
             text = text + self._cursor
         text = self._align(text, fillchar=self._fill_c, width=self._max_len)
 
@@ -92,8 +96,20 @@ class Input(Widget):
     def value(self):
         return self._text
 
+    @property
+    def label(self):
+        return self._label
+
+    @label.setter
+    def label(self, value):
+        if not isinstance(value, str):
+            raise TypeError('Only supported string')
+        self._label = value
+        self.on_change()
+
     @value.setter
     def value(self, value):
         if not isinstance(value, str):
             raise TypeError('Only supported string')
         self._text = value
+        self.on_change()

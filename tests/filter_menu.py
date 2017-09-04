@@ -4,13 +4,14 @@
 # https://opensource.org/licenses/MIT
 
 from random import randint
-
+from tebless.devs import Debug
+from tebless.utils import Store
 from tebless.widgets import FilterMenu, Window
 
 def main():
-    GLOBAL_STORE = {}
-    with Window(store=GLOBAL_STORE) as win:
-        win.add(FilterMenu, {
+    store = Store()
+    with Window(store=store) as win:
+        win += FilterMenu({
             'label': 'Filtrar: ',
             'validation': r'\d'
         }, {
@@ -21,4 +22,5 @@ def main():
         })
 
 if __name__ == '__main__':
-    main()
+    with Debug(__file__):
+        main()

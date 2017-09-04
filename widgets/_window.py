@@ -13,49 +13,67 @@ __all__ = ['Window']
 
 
 import blessed
+from axel import Event
 from tebless.devs import Widget
+from tebless.utils import Store
 from tebless.utils.term import echo
+from tebless.utils.constants import ENTER, ESC, DOWN, UP
 
 class Window(Widget):
     """Class that encapsulates a whole window and allows to own the elements inside.
 
     Usage:
         With Window (store) as window:
-            Window.add (element, properties)
-
+            Window += element
+    Or:
+        With Window (store) as window:
+            Window.add(element, properties)
     Params:
         store - Global storage is necessary
         parent - If you do not provider it is the main window
 
     """
-    def __init__(self, parent=None, **kwargs):
-        Widget.__init__(self, parent, **kwargs)
+    def __init__(self, *args, **kwargs):
+        Widget.__init__(self, *args, **kwargs)
         self._width, self._height = self._term.width, self._term.height
-
+        if not isinstance(self.store, Store):
+            raise TypeError("Store is invalid")
+        self._listen = True
         self._widgets = []
 
-    def paint(self):
-        """Paint all elements.
-        
-        """
+        self.on_enter = Event(self)
+        self.on_key_arrow = Event(self)
+        self.on_exit = Event(self)
+        self.on_exit += self.close
+        self.on_key = Event(self)
+
+    def _paint(self):
         echo(self._term.clear)
         for widget in self._widgets:
             widget.paint()
 
+
+    def close(self, *args, **kwargs):
+        self._listen = False
+
     def listen(self):
         """Blocking call on widgets.
-        
+
         """
-        focus = 0
-        listenners = [x for x in self._widgets if x.is_listenner]
-        while listenners:
-            self.paint()
-            res = listenners[focus].listen()
-            if focus + res < 0:
-                break
-
-            focus = (focus + res) % len(listenners)
-
+        while self._listen:
+            key = u''
+            key = self._term.inkey(timeout=0.2)
+            try:
+                if key.code == ENTER:
+                    self.on_enter(key=key)
+                elif key.code in (DOWN, UP):
+                    self.on_key_arrow(key=key)
+                elif key.code == ESC or key == chr(3):
+                    self.on_exit(key=key)
+                elif key != '':
+                    self.on_key(key=key)
+            except KeyboardInterrupt:
+                self.on_exit(key=key)
 
     def add(self, widget, *args, **kwargs):
         """Insert new element.
@@ -67,17 +85,44 @@ class Window(Widget):
             })
 
         """
-        if 'ref' in kwargs:
-            name = kwargs.pop('ref')
-            if name in self._store:
-                raise KeyError(f'{name} key already exist')
-            ins_widget = widget(self, *args, **kwargs)
-            self._store[name] = ins_widget
-        else:
-            ins_widget = widget(self, *args, **kwargs)
-        
-        self._widgets.append(ins_widget)
+        ins_widget = widget(*args, **kwargs)
+        self.__add__(ins_widget)
         return ins_widget
+
+    def __add__(self, widget):
+        """Insert new element.
+
+        Usage:
+            window += widget(**{
+                'prop1': val,
+                'prop2': val2
+            })
+
+        """
+        assert isinstance(widget, Widget)
+
+        if hasattr(widget, 'ref'):
+            name = widget.ref
+            if name in self.store:
+                raise KeyError(f'{name} key already exist')
+            widget.parent = self
+            self.store += {
+                name: widget
+            }
+        widget.store = self.store
+
+        #FIXME: Solve if after add element, add a listenner fail
+        if widget.on_enter.count() > 0:
+            self.on_enter += widget.on_enter
+        if widget.on_key_arrow.count() > 0:
+            self.on_key_arrow += widget.on_key_arrow
+        if widget.on_exit.count() > 0:
+            self.on_exit += widget.on_exit
+        if widget.on_key.count() > 0:
+            self.on_key += widget.on_key
+
+        self._widgets.append(widget)
+        return self
 
     @staticmethod
     def decorator(function=None, **d_wargs):
@@ -89,9 +134,8 @@ class Window(Widget):
                     raise RuntimeError("Window height is insufficient")
                 elif blessed.Terminal().width < min_x:
                     raise RuntimeError("Window width is insufficient")
-                    
                 with Window(*args, **kwargs) as win:
-                    func(win)
+                    func(win, *args, **kwargs)
 
             return wrapper
         if function:
@@ -102,14 +146,13 @@ class Window(Widget):
     def size(self):
         """ Height and Width of window. """
         return self._width, self._height
-
+    
     def __enter__(self):
         return self
 
     def __exit__(self, _type, _value, _traceback):
-        if len(self._widgets) == 0:
+        if not self._widgets:
             raise IndexError('Not widgets found')
-
         if self._parent is None:
             with self._term.cbreak(), self._term.hidden_cursor():
                 self.paint()

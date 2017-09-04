@@ -3,19 +3,18 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+from tebless.utils.colors import red
 from tebless.devs.decorators import theme
-__all__ = ['single']
+from tebless.utils.styles import underline_ns as u
+__all__ = ['single', 'double']
 
 @theme
 def single(window, config):
-    from tebless.utils.term import echo
-    from tebless.utils.colors import red
-    from tebless.utils.styles import underline_ns as u
     cx, cy = round(config.get('cordx', 0)), round(config.get('cordy', 0))
     color = config.get('color', red)
     icon = config.get('icon', '=')
     align = config.get('align', 'left')
-    
+
     move = window.term.move_x
     width = round(config.get('width', window.width))
 
@@ -41,20 +40,16 @@ def single(window, config):
     return {
         'header': header,
         'footer': footer,
-        'formater': lambda text: f'  {for_s(text[:width-4])}{l_eq}',
+        'formater': lambda text, **kw: f'  {for_s(text[:width-4])}{l_eq}',
         'selector': lambda text, **kw: f'  {u(for_s(text[:width-4]))}{l_eq}',
     }
 
 
 @theme
 def double(window, config):
-    from tebless.utils.term import echo
-    from tebless.utils.colors import red
-    from tebless.utils.styles import underline_ns as u
-    
     color = config.get('color', red)
     icon = config.get('icon', '=')
-    
+
     move = window.term.move_x
     width = config.get('width', window.width)
 
@@ -72,8 +67,6 @@ def double(window, config):
     return {
         'header': header,
         'footer':_footer,
-        'formater': lambda text: f'{l_eq} {text[:width-8]}',
-        'selector': lambda text, **kw: f'{l_eq} {u(text[:width-8])}',
+        'formater': lambda text, **kw: f'{l_eq} {text[:width]}',
+        'selector': lambda text, **kw: f'{l_eq} {u(text[:width])}',
     }
-
-del theme

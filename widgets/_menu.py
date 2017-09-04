@@ -12,10 +12,12 @@
     Copyright (c) 2017 MIT. All rights reserved.
 """
 from math import floor, ceil
-from tebless.devs import Widget
-from tebless.utils.term import echo
-from tebless.utils.colors import red
 
+from tebless.devs import Widget
+from tebless.utils.term import echo, cut_text
+from tebless.utils.colors import red
+from tebless.utils.constants import DOWN, UP
+from blessed import Terminal
 __all__ = ['Menu']
 
 class Menu(Widget):
@@ -35,19 +37,17 @@ class Menu(Widget):
         empty - Whats show if table is empty
         key - A function return text of object in list
 
-    Events:
-        on_enter - Callback on enter
 
     """
-    def __init__(self, parent, items=None, **kwargs):
-        Widget.__init__(self, parent, **kwargs)
+    def __init__(self, items=None, *args, **kwargs):
+        Widget.__init__(self, *args, **kwargs)
 
         self._items = items or []
         self._empty = kwargs.get('empty', ['Sin elementos'])
         self._is_menu = kwargs.get('is_menu', True)
         self._limit = round(kwargs.get('limit', 4))
         if not 'width' in kwargs:
-            self._width = parent.width
+            self._width = Terminal().width
         self._header = kwargs.get('header', '')
         self._footer = kwargs.get('footer', '')
 
@@ -56,40 +56,34 @@ class Menu(Widget):
 
         self._selector = kwargs.get('selector', selector)
         self._key = kwargs.get('key', lambda x: x)
-        self._formater = kwargs.get('formater', lambda x: '  ' + x[:self._width-2])
-        self._listen = False
+        self._formater = kwargs.get('formater', lambda text, **kw: '  ' + text[:self._width])
         self._page = 1
-        self._current = 0
+        self._index = 0
         self._height = 0
+        self.on_key_arrow += self._on_key_arrow
 
-    def listen(self):
-        if not self._is_menu or not self.items:
-            return 1
 
-        key = u''
-        key = self._term.inkey(timeout=0.2)
-        if key.code == self._term.KEY_ENTER:
-            return self._on_enter(self) or 1
-        elif key.code == self._term.KEY_DOWN:
-            self._current = (self._current + 1) % len(self.items)
-        elif key.code == self._term.KEY_UP:
-            self._current = (self._current - 1) % len(self.items)
-        elif key.code == self._term.KEY_ESCAPE:
-            return -1
-        return 0
+    def _on_key_arrow(self, *args, **kwargs):
+        key = kwargs.get('key')
+        if key.code == DOWN:
+            self.index = (self.index + 1) % len(self.items)
+        elif key.code == UP:
+            self.index = (self.index - 1) % len(self.items)
 
-    def paint(self):
-        """ Paint widget in the window """
-        self.destroy()
-        self._page = ceil((self._current+1)/self._limit)
+    def _paint(self):
+        self._page = ceil((self._index+1)/self._limit)
+
         term = self._term
         echo(term.move(self.y, self.x))
 
-        header_height = len(self._header.split('\n')) - 1
-        footer_height = len(self._footer.split('\n')) - 1
+        header_height, footer_height = 0, 0
+        if self._header != '':
+            header_height = len(self._header.split('\n'))
+        if self._footer != '':
+            footer_height = len(self._footer.split('\n'))
 
         items = self.items if self.items else self._empty
-        first = floor(self._current/self._limit)*self._limit
+        first = floor(self._index/self._limit)*self._limit
         max_page = ceil(len(items) / self._limit)
 
         items = items[first:self._limit+first]
@@ -102,54 +96,59 @@ class Menu(Widget):
 
         ## Print header
         if self._header != '':
-            echo(self._header.format(**vars_op) + '\n')
+            echo(cut_text(self._header.format(**vars_op), end=self.width) + '\n')
         self._height = header_height
 
         ## Print elements
         for idx, item in enumerate(items):
-            try:
-                format_text = self._key(item).split('\n')
-            except TypeError :
-                raise TypeError('Menu Widget: If the format of the elements changes and is not a str, change the empty parameter to match')
-
-            for text in format_text:
+            array_text = self._key(item)
+            if isinstance(array_text, str):
+                array_text = [array_text]
+            for index, text in enumerate(array_text):
                 echo(term.move_x(self.x))
-                tmp = self._formater(text)
-                pos = self._current % self._limit == idx
-
+                tmp = self._formater(**{
+                    'text': text,
+                    'index': index, 
+                    'lenght': len(array_text)
+                })
+                pos = self._index % self._limit == idx
                 if pos and self._is_menu and text != '':
                     tmp = self._selector(**{
-                        'text': text,
+                        'text': text[:self.width],
                         'index': pos,
-                        'lenght': len(format_text)
+                        'lenght': len(array_text)
                     })
-
-                echo(tmp + '\n')
-                self._height += 1
+                tmp += '\n'
+                self._height += tmp.count('\n')
+                echo(tmp)
 
         ## Print footer
         if self._footer != '':
             echo(term.move_x(self.x))
-            echo(self._footer.format(**vars_op))
+            echo(cut_text(self._footer.format(**vars_op), end=self.width))
         self._height += footer_height
 
-    @property
-    def is_listenner(self):
-        return self._is_menu and self.items
 
     @property
     def value(self):
-        return self.items[self._current]
+        return self.items[self._index]
 
     @property
     def index(self):
-        return self._current
+        return self._index
+    
+    @index.setter
+    def index(self, value):
+        self._index = value
+        self.on_change()
 
     @property
     def items(self):
         return list(self._items)
     
+
     @items.setter
     def items(self, value):
-        self._current = 0
+        self._index = 0
         self._items = list(value)
+        self.on_change()
