@@ -3,16 +3,17 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-from tebless.utils.term import echo
 from tebless.devs import Widget
+from tebless.utils.term import echo, move
 
 class Label(Widget):
     def __init__(self, *args, **kwargs):
         Widget.__init__(self, *args, **kwargs)
         self._text = kwargs.get('text', 'Label')
         self._prev = ''
+
     def _paint(self):
-        echo(self.term.move(self.y, self.x) + self.value)
+        move(self.y, self.x, self.value)
 
     @property
     def value(self):
@@ -27,6 +28,7 @@ class Label(Widget):
     @property
     def width(self):
         return len(self._prev)
+
     @property
     def height(self):
         return 1

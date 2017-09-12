@@ -13,10 +13,12 @@ __all__ = ['Window']
 
 
 import blessed
-from axel import Event
+from events import Events
+from functools import wraps
 from tebless.devs import Widget
 from tebless.utils import Store
-from tebless.utils.term import echo
+from tebless.utils.term import width, height, size
+from tebless.utils.term import echo, clear, inkey, cbreak, hidden_cursor
 from tebless.utils.constants import ENTER, ESC, DOWN, UP
 
 class Window(Widget):
@@ -35,20 +37,20 @@ class Window(Widget):
     """
     def __init__(self, *args, **kwargs):
         Widget.__init__(self, *args, **kwargs)
-        self._width, self._height = self._term.width, self._term.height
+        self._width, self._height = size
         if not isinstance(self.store, Store):
             raise TypeError("Store is invalid")
         self._listen = True
         self._widgets = []
-
-        self.on_enter = Event(self)
-        self.on_key_arrow = Event(self)
-        self.on_exit = Event(self)
+        events = Events()
+        self.on_enter = events.on_enter
+        self.on_key_arrow = events.on_key_arrow
+        self.on_exit = events.on_exit
         self.on_exit += self.close
-        self.on_key = Event(self)
+        self.on_key = events.on_key
 
     def _paint(self):
-        echo(self._term.clear)
+        clear()
         for widget in self._widgets:
             widget.paint()
 
@@ -62,7 +64,7 @@ class Window(Widget):
         """
         while self._listen:
             key = u''
-            key = self._term.inkey(timeout=0.2)
+            key = inkey(timeout=0.2)
             try:
                 if key.code == ENTER:
                     self.on_enter(key=key)
@@ -74,6 +76,8 @@ class Window(Widget):
                     self.on_key(key=key)
             except KeyboardInterrupt:
                 self.on_exit(key=key)
+
+
 
     def add(self, widget, *args, **kwargs):
         """Insert new element.
@@ -101,25 +105,21 @@ class Window(Widget):
         """
         assert isinstance(widget, Widget)
 
-        if hasattr(widget, 'ref'):
+        if widget.ref:
             name = widget.ref
             if name in self.store:
                 raise KeyError(f'{name} key already exist')
-            widget.parent = self
-            self.store += {
+            self.store.update({
                 name: widget
-            }
+            })
+        widget.parent = self
         widget.store = self.store
 
         #FIXME: Solve if after add element, add a listenner fail
-        if widget.on_enter.count() > 0:
-            self.on_enter += widget.on_enter
-        if widget.on_key_arrow.count() > 0:
-            self.on_key_arrow += widget.on_key_arrow
-        if widget.on_exit.count() > 0:
-            self.on_exit += widget.on_exit
-        if widget.on_key.count() > 0:
-            self.on_key += widget.on_key
+        self.on_enter += widget.on_enter
+        self.on_key_arrow += widget.on_key_arrow
+        self.on_exit += widget.on_exit
+        self.on_key += widget.on_key
 
         self._widgets.append(widget)
         return self
@@ -130,9 +130,9 @@ class Window(Widget):
             def wrapper(*args, **kwargs):
                 min_x = d_wargs.get('min_x', 0)
                 min_y = d_wargs.get('min_y', 0)
-                if blessed.Terminal().height < min_y:
+                if height < min_y:
                     raise RuntimeError("Window height is insufficient")
-                elif blessed.Terminal().width < min_x:
+                elif width < min_x:
                     raise RuntimeError("Window width is insufficient")
                 with Window(*args, **kwargs) as win:
                     func(win, *args, **kwargs)
@@ -148,13 +148,14 @@ class Window(Widget):
         return self._width, self._height
     
     def __enter__(self):
+        clear()
         return self
 
     def __exit__(self, _type, _value, _traceback):
         if not self._widgets:
             raise IndexError('Not widgets found')
         if self._parent is None:
-            with self._term.cbreak(), self._term.hidden_cursor():
+            with cbreak(), hidden_cursor():
                 self.paint()
                 self.listen()
         else:

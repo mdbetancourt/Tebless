@@ -9,14 +9,20 @@ __all__ = ['echo', 'apply_style']
 
 import re
 import functools
+from blessed import Terminal
 
 echo = functools.partial(print, end='', flush=True)
-def extract_styles(text):
-    return re.sub(r'(\x1b\[\d+m)|(\x1b\(B\x1b\[m)', '', text)
-def cut_text(text, init=0, end=0):
-    tmp = extract_styles(text)
-    tmp_cut = tmp[init:end]
-    return text.replace(tmp, tmp_cut)
+
+strip_seqs = Terminal().strip_seqs
+move = lambda x, y, text: echo(Terminal().move(x, y) + text)
+clear = lambda: echo(Terminal().clear)
+inkey = Terminal().inkey
+cbreak = Terminal().cbreak
+hidden_cursor = Terminal().hidden_cursor
+height = Terminal().height
+width = Terminal().width
+size = width, height
+
 def apply_style(item, styles):
     """ """
     return functools.reduce(lambda x, fn: fn(x), [item, *styles])

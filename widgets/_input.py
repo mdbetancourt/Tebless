@@ -14,10 +14,10 @@
 __all__ = ['Input']
 
 import re
+from blessed import Terminal
 from tebless.devs import Widget
-from tebless.utils.term import echo
 from tebless.utils.styles import ljust
-from tebless.utils.term import extract_styles
+from tebless.utils.term import echo, strip_seqs, move
 from tebless.utils.constants import BACKSPACE, DEL
 
 class Input(Widget):
@@ -38,9 +38,9 @@ class Input(Widget):
     """
     def __init__(self, text='', label='', max_len=6, *args, **kwargs):
         Widget.__init__(self, *args, **kwargs)
-
         self._text = text
         self._label = label
+
         self._max_len = round(max_len)
         self._align = kwargs.get('align', ljust)
         self._fill_c = kwargs.get('fill_c', '_')
@@ -52,11 +52,11 @@ class Input(Widget):
         self._text_style = kwargs.get('text_style', lambda x: x)
 
 
-        if len(self._text) > self._max_len:
+        if len(strip_seqs(self._text)) > self._max_len:
             raise ValueError('text is too long')
-        elif len(extract_styles(self._fill_c)) > 1:
+        elif len(strip_seqs(self._fill_c)) > 1:
             raise ValueError('fill_c need a char')
-        elif len(extract_styles(self._cursor)) > 1:
+        elif len(strip_seqs(self._cursor)) > 1:
             raise ValueError('cursor need a char')
 
         self.on_key += self._on_key
@@ -66,21 +66,21 @@ class Input(Widget):
         correct_len = len(self.value) < self._max_len
         validations = re.match(self._validation, key) and key.isprintable()
 
+        #TODO: Add event on fail validation
         if correct_len and validations:
             self.value += key
         elif key.code in (BACKSPACE, DEL) and self.value:
             self.value = self.value[:-1]
 
     def _paint(self):
-        term = self._term
         text = self._text_style(self.value)
         if len(self.value) < self._max_len:
             text = text + self._cursor
         text = self._align(text, fillchar=self._fill_c, width=self._max_len)
 
-        input_field = self._left_l + text + self._right_l
+        input_field = self._left_l + text + self._right_l # [_______]
 
-        echo(term.move(self.y, self.x) + self._label + input_field)
+        move(self.y, self.x, self._label + input_field) # label 
 
     @property
     def width(self):
@@ -109,7 +109,7 @@ class Input(Widget):
 
     @value.setter
     def value(self, value):
-        if not isinstance(value, str):
-            raise TypeError('Only supported string')
-        self._text = value
+        if not (isinstance(value, str) or isinstance(value, int)):
+            raise TypeError('Only supported string or int')
+        self._text = str(value)
         self.on_change()
