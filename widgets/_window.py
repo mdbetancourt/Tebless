@@ -13,8 +13,8 @@ __all__ = ['Window']
 
 
 from events import Events
-from tebless.devs import Widget, echo
 from tebless.utils import Store
+from tebless.devs import Widget, echo
 from tebless.utils.constants import ENTER, ESC, DOWN, UP
 
 class Window(Widget):
@@ -91,7 +91,7 @@ class Window(Widget):
         self.__add__(ins_widget)
         return ins_widget
 
-    def __add__(self, widget):
+    def __add__(self, widgets):
         """Insert new element.
 
         Usage:
@@ -101,25 +101,31 @@ class Window(Widget):
             })
 
         """
-        assert isinstance(widget, Widget)
+        if not isinstance(widgets, (list, tuple)):
+            if not isinstance(widgets, Widget):
+                raise TypeError("Only Widgets and list of widgets")
+            widgets = [widgets]
+        
+        for widget in widgets:
+            if not isinstance(widget, Widget):
+                raise TypeError("Only Widgets")
+            if widget.ref:
+                name = widget.ref
+                if name in self.store:
+                    raise KeyError(f'{name} key already exist')
+                self.store.update({
+                    name: widget
+                })
+            widget.parent = self
+            widget.store = self.store
 
-        if widget.ref:
-            name = widget.ref
-            if name in self.store:
-                raise KeyError(f'{name} key already exist')
-            self.store.update({
-                name: widget
-            })
-        widget.parent = self
-        widget.store = self.store
+            #FIXME: Solve if after add element, add a listenner fail
+            self.on_enter += widget.on_enter
+            self.on_key_arrow += widget.on_key_arrow
+            self.on_exit += widget.on_exit
+            self.on_key += widget.on_key
 
-        #FIXME: Solve if after add element, add a listenner fail
-        self.on_enter += widget.on_enter
-        self.on_key_arrow += widget.on_key_arrow
-        self.on_exit += widget.on_exit
-        self.on_key += widget.on_key
-
-        self._widgets.append(widget)
+            self._widgets.append(widget)
         return self
 
     @staticmethod
@@ -128,14 +134,21 @@ class Window(Widget):
             def wrapper(*args, **kwargs):
                 min_x = d_wargs.get('min_x', 0)
                 min_y = d_wargs.get('min_y', 0)
-                
-                with Window(*args, **kwargs) as win:
+                store = d_wargs.get('store', Store())
+
+                if not store.get('windows'):
+                    store.windows = [None]
+
+                tmp = None
+                with Window(parent=store.windows[-1], store=store) as win:
+                    tmp = win
+                    store.windows.append(tmp)
                     if win.height < min_y:
                         raise RuntimeError("Window height is insufficient")
                     elif win.width < min_x:
                         raise RuntimeError("Window width is insufficient")
                     func(win, *args, **kwargs)
-
+                store.windows.remove(tmp)
             return wrapper
         if function:
             return _decorator(function)

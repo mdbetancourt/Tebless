@@ -3,17 +3,30 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
+from functools import partial
+
 from blessed import Terminal
 from tebless.devs import Widget, echo
 
 class Label(Widget):
-    def __init__(self, *args, **kwargs):
-        Widget.__init__(self, *args, **kwargs)
-        self._text = kwargs.get('text', 'Label')
+    def __init__(self, text='Label', align='left', width=20, *args, **kwargs):
+        Widget.__init__(self, width=width, *args, **kwargs)
+        self._text = text
         self._prev = ''
+        if align == 'right':
+            self._align = self.term.rjust
+        elif align == 'center':
+            self._align = self.term.center
+        elif align == 'left':
+            self._align = self.term.ljust
+        else:
+            raise ValueError("Only align center, left, right")
+
+        
 
     def _paint(self):
-        echo(self.term.move(self.y, self.x) + self.value)
+        value = self._align(self.value, width=self.width)
+        echo(self.term.move(self.y, self.x) + value)
 
     @property
     def value(self):
@@ -30,10 +43,6 @@ class Label(Widget):
         line = (' ' * width) + '\n'
         lines = line * self.height
         echo(self.term.move(self.y, self.x) + lines)
-
-    @property
-    def width(self):
-        return self.term.length(self._text)
 
     @property
     def height(self):
