@@ -14,7 +14,7 @@
 
 
 __all__ = ['FilterMenu']
-from axel import Event
+from events import Events
 from tebless.devs import Widget
 from tebless.widgets import Input, Menu
 
@@ -23,7 +23,8 @@ class FilterMenu(Widget):
         Widget.__init__(self, *args, **kwargs)
         self._key = kwargs.get('key', s_menu.get('key', lambda x: x))
         self._text = ''
-        self.on_select = Event(self)
+        events = Events()
+        self.on_select = events.on_select
 
         _s_menu = {
             'on_enter': self.on_select

@@ -12,13 +12,9 @@ Copyright (c) 2017 ACT. All rights reserved.
 __all__ = ['Window']
 
 
-import blessed
 from events import Events
-from functools import wraps
-from tebless.devs import Widget
+from tebless.devs import Widget, echo
 from tebless.utils import Store
-from tebless.utils.term import width, height, size
-from tebless.utils.term import echo, clear, inkey, cbreak, hidden_cursor
 from tebless.utils.constants import ENTER, ESC, DOWN, UP
 
 class Window(Widget):
@@ -37,9 +33,11 @@ class Window(Widget):
     """
     def __init__(self, *args, **kwargs):
         Widget.__init__(self, *args, **kwargs)
-        self._width, self._height = size
+        self._width, self._height = self.term.width, self.term.height
+
         if not isinstance(self.store, Store):
             raise TypeError("Store is invalid")
+
         self._listen = True
         self._widgets = []
         events = Events()
@@ -50,7 +48,7 @@ class Window(Widget):
         self.on_key = events.on_key
 
     def _paint(self):
-        clear()
+        echo(self.term.clear)
         for widget in self._widgets:
             widget.paint()
 
@@ -64,7 +62,7 @@ class Window(Widget):
         """
         while self._listen:
             key = u''
-            key = inkey(timeout=0.2)
+            key = self.term.inkey(timeout=0.2)
             try:
                 if key.code == ENTER:
                     self.on_enter(key=key)
@@ -130,11 +128,12 @@ class Window(Widget):
             def wrapper(*args, **kwargs):
                 min_x = d_wargs.get('min_x', 0)
                 min_y = d_wargs.get('min_y', 0)
-                if height < min_y:
-                    raise RuntimeError("Window height is insufficient")
-                elif width < min_x:
-                    raise RuntimeError("Window width is insufficient")
+                
                 with Window(*args, **kwargs) as win:
+                    if win.height < min_y:
+                        raise RuntimeError("Window height is insufficient")
+                    elif win.width < min_x:
+                        raise RuntimeError("Window width is insufficient")
                     func(win, *args, **kwargs)
 
             return wrapper
@@ -148,14 +147,14 @@ class Window(Widget):
         return self._width, self._height
     
     def __enter__(self):
-        clear()
+        echo(self.term.clear)
         return self
 
     def __exit__(self, _type, _value, _traceback):
         if not self._widgets:
             raise IndexError('Not widgets found')
         if self._parent is None:
-            with cbreak(), hidden_cursor():
+            with self.term.cbreak(), self.term.hidden_cursor():
                 self.paint()
                 self.listen()
         else:

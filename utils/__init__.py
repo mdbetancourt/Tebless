@@ -173,5 +173,3 @@ class Store(MutableMapping, OrderedDict):
         return d
     def __getstate__(self): return self.__dict__
     def __setstate__(self, d): self.__dict__.update(d)
-
-

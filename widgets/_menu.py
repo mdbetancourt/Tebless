@@ -13,11 +13,10 @@
 """
 from math import floor, ceil
 
-from tebless.devs import Widget
-from tebless.utils.term import echo, cut_text
-from tebless.utils.colors import red
+from tebless.utils.styles import red
+from tebless.devs import Widget, echo
 from tebless.utils.constants import DOWN, UP
-from blessed import Terminal
+
 __all__ = ['Menu']
 
 class Menu(Widget):
@@ -47,12 +46,12 @@ class Menu(Widget):
         self._is_menu = kwargs.get('is_menu', True)
         self._limit = round(kwargs.get('limit', 4))
         if not 'width' in kwargs:
-            self._width = Terminal().width
+            self._width = self.term.width
         self._header = kwargs.get('header', '')
         self._footer = kwargs.get('footer', '')
 
         def selector(text, **kwargs):
-            return red('| ') + text if len(text) > 0 else text
+            return red('| ') + text if self.term.length(text) > 0 else text
 
         self._selector = kwargs.get('selector', selector)
         self._key = kwargs.get('key', lambda x: x)
@@ -73,8 +72,7 @@ class Menu(Widget):
     def _paint(self):
         self._page = ceil((self._index+1)/self._limit)
 
-        term = self._term
-        echo(term.move(self.y, self.x))
+        echo(self.term.move(self.y, self.x))
 
         header_height, footer_height = 0, 0
         if self._header != '':
@@ -96,7 +94,7 @@ class Menu(Widget):
 
         ## Print header
         if self._header != '':
-            echo(cut_text(self._header.format(**vars_op), end=self.width) + '\n')
+            echo(self._header.format(**vars_op) + '\n')
         self._height = header_height
 
         ## Print elements
@@ -105,7 +103,7 @@ class Menu(Widget):
             if isinstance(array_text, str):
                 array_text = [array_text]
             for index, text in enumerate(array_text):
-                echo(term.move_x(self.x))
+                echo(self.term.move_x(self.x))
                 tmp = self._formater(**{
                     'text': text,
                     'index': index, 
@@ -124,8 +122,8 @@ class Menu(Widget):
 
         ## Print footer
         if self._footer != '':
-            echo(term.move_x(self.x))
-            echo(cut_text(self._footer.format(**vars_op), end=self.width))
+            echo(self.term.move_x(self.x))
+            echo(self._footer.format(**vars_op))
         self._height += footer_height
 
 

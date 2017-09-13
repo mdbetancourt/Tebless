@@ -14,10 +14,7 @@
 __all__ = ['Input']
 
 import re
-from blessed import Terminal
-from tebless.devs import Widget
-from tebless.utils.styles import ljust
-from tebless.utils.term import echo, strip_seqs, move
+from tebless.devs import Widget, echo
 from tebless.utils.constants import BACKSPACE, DEL
 
 class Input(Widget):
@@ -42,7 +39,7 @@ class Input(Widget):
         self._label = label
 
         self._max_len = round(max_len)
-        self._align = kwargs.get('align', ljust)
+        align = kwargs.get('align', 'left')
         self._fill_c = kwargs.get('fill_c', '_')
         self._cursor = kwargs.get('cursor', '_')
 
@@ -51,12 +48,20 @@ class Input(Widget):
         self._validation = kwargs.get('validation', r'.')
         self._text_style = kwargs.get('text_style', lambda x: x)
 
+        if align == 'left':
+            self._align = self.term.ljust
+        elif align == 'center':
+            self._align = self.term.center
+        elif align == 'right':
+            self._align = self.term.rjust
+        else:
+            raise ValueError('Only valids aligns: left, right, center')
 
-        if len(strip_seqs(self._text)) > self._max_len:
+        if self.term.length(self._text) > self._max_len:
             raise ValueError('text is too long')
-        elif len(strip_seqs(self._fill_c)) > 1:
+        elif self.term.length(self._fill_c) > 1:
             raise ValueError('fill_c need a char')
-        elif len(strip_seqs(self._cursor)) > 1:
+        elif self.term.length(self._cursor) > 1:
             raise ValueError('cursor need a char')
 
         self.on_key += self._on_key
@@ -80,7 +85,7 @@ class Input(Widget):
 
         input_field = self._left_l + text + self._right_l # [_______]
 
-        move(self.y, self.x, self._label + input_field) # label 
+        echo(self.term.move(self.y, self.x) + self._label + input_field) # label 
 
     @property
     def width(self):

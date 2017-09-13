@@ -2,16 +2,21 @@
 # 
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
-"""Style the text.
+
+"""Colors funtions for terminal.
 
 """
 import blessed
+from tebless.utils.constants import TERM
+__all__ = ['green', 'yellow', 'red', 'blue']
 
-bold = blessed.Terminal().bold
-underline = blessed.Terminal().underline
-center = blessed.Terminal().center
-ljust = blessed.Terminal().ljust
-rjust = blessed.Terminal().rjust
+green = TERM.green
+yellow = TERM.yellow
+red = TERM.red
+white = TERM.white
+blue = TERM.blue
+underline = TERM.underline
+
 def underline_ns(text):
     tmp = text.strip(' ')
     return text.replace(tmp, underline(tmp))

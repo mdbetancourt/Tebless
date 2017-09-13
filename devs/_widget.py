@@ -4,11 +4,10 @@
 # https://opensource.org/licenses/MIT
 
 import logging
-import blessed
+from blessed import Terminal
 from events import Events
 from tebless.utils import Store
-from tebless.devs import get_events
-from tebless.utils.term import echo, move
+from tebless.devs import get_events, echo
 
 class Widget(object):
     """Widget BaseClass.
@@ -20,8 +19,8 @@ class Widget(object):
         self._cordy = round(cordy)
         self._width = round(width)
         self._height = round(height)
-
         self._parent = kwargs.get('parent', None)
+        self._term = Terminal()
         if self._parent:
             self._store = self._parent.store
         else:
@@ -48,15 +47,15 @@ class Widget(object):
         logging.debug(f"{self} events: {events}")
         for key, event in events.items():
             if key == 'on_enter':
-                self.on_enter += lambda *args, **kwargs: event(self, *args, **kwargs)
+                self.on_enter += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
             elif key == 'on_key_arrow':
-                self.on_key_arrow += lambda *args, **kwargs: event(self, *args, **kwargs)
+                self.on_key_arrow += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
             elif key == 'on_exit':
-                self.on_exit += lambda *args, **kwargs: event(self, *args, **kwargs)
+                self.on_exit += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
             elif key == 'on_key':
-                self.on_key += lambda *args, **kwargs: event(self, *args, **kwargs)
+                self.on_key += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
             elif key == 'on_change':
-                self.on_change += lambda *args, **kwargs: event(self, *args, **kwargs)
+                self.on_change += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
 
     def paint(self, *_):
         """ Print widget in the window """
@@ -72,9 +71,11 @@ class Widget(object):
 
     def _paint(self):
         raise NotImplementedError("All child class of widget need implement _paint method")
+
     def _destroy(self):
-        for y_val in range(self.y, self.y + self.height):
-            move(y_val, self.x, ' ' * (self.width+1))
+        line = (' ' * self.width) + '\n'
+        lines = line * self.height
+        echo(self.term.move(self.y, self.x) + lines)
 
     @property
     def parent(self):
@@ -83,6 +84,10 @@ class Widget(object):
     @parent.setter
     def parent(self, value):
         self._parent = value
+
+    @property
+    def term(self):
+        return self._term
 
     @property
     def store(self):

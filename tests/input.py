@@ -1,20 +1,25 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
+"""Test input.
 
+"""
 from tebless.devs import Debug
 from tebless.utils import Store
-from tebless.utils.colors import red
+from tebless.utils.styles import red
 from tebless.widgets import Input, Window, Label
 
-store = Store()
 
-@Window.decorator(store=store)
+@Window.decorator
 def view_input(window):
+    """Window.
+
+    """
     store = window.store
 
-    def change_label(sender, *args, **kwargs):
+    def change_label(sender, *_, **__):
+        """event func"""
         store.label.value = sender.value
 
     window += Input(
@@ -31,6 +36,9 @@ def view_input(window):
     )
 
 def main():
+    """Main.
+
+    """
     view_input()
 
 if __name__ == '__main__':

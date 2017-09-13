@@ -9,9 +9,10 @@
 
 import blessed
 
-ENTER = blessed.Terminal().KEY_ENTER
-ESC = blessed.Terminal().KEY_ESCAPE
-DOWN = blessed.Terminal().KEY_DOWN
-UP = blessed.Terminal().KEY_UP
-BACKSPACE = blessed.Terminal().KEY_BACKSPACE
-DEL = blessed.Terminal().KEY_DELETE
+TERM = blessed.Terminal()
+ENTER = TERM.KEY_ENTER
+ESC = TERM.KEY_ESCAPE
+DOWN = TERM.KEY_DOWN
+UP = TERM.KEY_UP
+BACKSPACE = TERM.KEY_BACKSPACE
+DEL = TERM.KEY_DELETE

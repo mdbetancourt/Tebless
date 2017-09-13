@@ -3,8 +3,8 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-from tebless.devs import Widget
-from tebless.utils.term import echo, move
+from blessed import Terminal
+from tebless.devs import Widget, echo
 
 class Label(Widget):
     def __init__(self, *args, **kwargs):
@@ -13,7 +13,7 @@ class Label(Widget):
         self._prev = ''
 
     def _paint(self):
-        move(self.y, self.x, self.value)
+        echo(self.term.move(self.y, self.x) + self.value)
 
     @property
     def value(self):
@@ -25,9 +25,15 @@ class Label(Widget):
         self._text = text
         self.on_change()
 
+    def _destroy(self):
+        width = self.term.length(self._prev)
+        line = (' ' * width) + '\n'
+        lines = line * self.height
+        echo(self.term.move(self.y, self.x) + lines)
+
     @property
     def width(self):
-        return len(self._prev)
+        return self.term.length(self._text)
 
     @property
     def height(self):

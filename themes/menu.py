@@ -2,71 +2,96 @@
 # 
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
-
-from tebless.utils.colors import red
+import functools
+from tebless.utils.styles import red, white, underline_ns
 from tebless.devs.decorators import theme
-from tebless.utils.styles import underline_ns as u
 __all__ = ['single', 'double']
 
 @theme
 def single(window, config):
-    cx, cy = round(config.get('cordx', 0)), round(config.get('cordy', 0))
+    """Single theme
+    ===== Header =====
+    = items          =
+    ==================
+
+    """
+    cordx = round(config.get('cordx', 0))
     color = config.get('color', red)
     icon = config.get('icon', '=')
     align = config.get('align', 'left')
+    term = window.term
 
-    move = window.term.move_x
     width = round(config.get('width', window.width))
 
     title = config.get('header', ' Menu ')
-    back = config.get('footer', '')
-    tmp_text = title
+    header = term.center(title, width, icon)
+    header = header.split(title)
+    header = color(header[0]) + title + color(header[1])
 
-    header = title.center(width, icon)
-    header = header.split(tmp_text)
-    header = color(header[0]) + tmp_text + color(header[1])
+    footer = color(icon * width)
 
-    icon = color(icon)
+    l_eq = term.move_x(cordx) + color(icon)
+    l_eq += term.move_x(cordx+width-1) + color(icon) + term.move_x(cordx+2)
 
-    footer = icon * width
-    l_eq = move(cx) + icon + move(cx+width-1) + icon + move(2)
     if align == 'right':
-        for_s = lambda x: x.rjust(width-4)
+        for_s = functools.partial(term.rjust, width=width-4) #*
     elif align == 'center':
-        for_s = lambda x: x.center(width-4)
+        for_s = functools.partial(term.center, width=width-4) # -4 width "= text =" 
+    elif align == 'left':
+        for_s = functools.partial(term.ljust, width=width-4) #*
     else:
-        for_s = lambda x: x.ljust(width-4)
+        raise ValueError("Only align center, left, right")
 
     return {
         'header': header,
         'footer': footer,
-        'formater': lambda text, **kw: f'  {for_s(text[:width-4])}{l_eq}',
-        'selector': lambda text, **kw: f'  {u(for_s(text[:width-4]))}{l_eq}',
+        'formater': lambda text, **kwargs: l_eq + for_s(text),
+        'selector': lambda text, **kwargs: l_eq + underline_ns(for_s(text)),
     }
 
 
 @theme
 def double(window, config):
+    """Double theme
+    ==================
+    =     Header     =
+    ==================
+    = items          =
+    ==================
+    = footer         =
+    ==================
+
+    """
+    cordx = round(config.get('cordx', 0))
     color = config.get('color', red)
     icon = config.get('icon', '=')
-
-    move = window.term.move_x
     width = config.get('width', window.width)
-
     title = config.get('header', 'Menu'.center(width-2))
-    title = title[:width-3]
     back = config.get('footer', 'Pagina: {page:03d}/{last:03d}')
-    line = color(icon * (width))
-    l_eq = move(0) + color(icon) + move(width-1) + color(icon) + move(2)
+    align = config.get('align', 'left')
+
+    term = window.term
+    line = color(icon * width)
+
+    l_eq = term.move_x(cordx) + color(icon)
+    l_eq += term.move_x(cordx+width-1) + color(icon) + term.move_x(cordx+1)
 
     wrapper = f'{line}\n{l_eq}{{}}\n{line}'
 
     header = wrapper.format(title)
-    _footer = wrapper.format(back)
+    footer = wrapper.format(back)
 
+    if align == 'right':
+        for_s = functools.partial(term.rjust, width=width-4) #*
+    elif align == 'center':
+        for_s = functools.partial(term.center, width=width-4) # -4 width "= text =" 
+    elif align == 'left':
+        for_s = functools.partial(term.ljust, width=width-4) #*
+    else:
+        raise ValueError("Only align center, left, right")
     return {
         'header': header,
-        'footer':_footer,
-        'formater': lambda text, **kw: f'{l_eq} {text[:width]}',
-        'selector': lambda text, **kw: f'{l_eq} {u(text[:width])}',
+        'footer':footer,
+        'formater': lambda text, **kwargs: f'{l_eq} {for_s(text)}',
+        'selector': lambda text, **kwargs: f'{l_eq} {underline_ns(for_s(text))}',
     }

@@ -4,9 +4,11 @@
 # https://opensource.org/licenses/MIT
 
 import logging
-
+import functools
 def get_events(_dict):
     return dict(filter(lambda item: 'on_' in item[0], _dict.items()))
+
+echo = functools.partial(print, end='', flush=True)
 
 class Debug:
     """Context Debug config a app for debug.
