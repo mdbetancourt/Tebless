@@ -42,6 +42,7 @@ class Menu(Widget):
         Widget.__init__(self, *args, **kwargs)
 
         self._items = items or []
+        self._len_items = len(self._items)
         self._empty = kwargs.get('empty', ['Sin elementos'])
         self._is_menu = kwargs.get('is_menu', True)
         self._limit = round(kwargs.get('limit', 4))
@@ -65,9 +66,9 @@ class Menu(Widget):
     def _on_key_arrow(self, *args, **kwargs):
         key = kwargs.get('key')
         if key.code == DOWN:
-            self.index = (self.index + 1) % len(self.items)
+            self.index = (self.index + 1) % self._len_items
         elif key.code == UP:
-            self.index = (self.index - 1) % len(self.items)
+            self.index = (self.index - 1) % self._len_items
 
     def _paint(self):
         self._page = ceil((self._index+1)/self._limit)
@@ -89,7 +90,7 @@ class Menu(Widget):
         vars_op = {
             'page': self._page,
             'last': max_page,
-            'count': len(self.items)
+            'count': self._len_items
         }
 
         ## Print header
@@ -149,4 +150,5 @@ class Menu(Widget):
     def items(self, value):
         self._index = 0
         self._items = list(value)
+        self._len_items = len(self._items)
         self.on_change()

@@ -134,7 +134,14 @@ class Window(Widget):
             def wrapper(*args, **kwargs):
                 min_x = d_wargs.get('min_x', 0)
                 min_y = d_wargs.get('min_y', 0)
-                store = d_wargs.get('store', Store())
+                if 'store' in d_wargs and 'store' in kwargs:
+                    raise SyntaxError("store argument repeated")
+                elif 'store' in d_wargs:
+                    store = d_wargs.get('store')
+                elif 'store' in kwargs:
+                    store = kwargs.pop('store')
+                else:
+                    store = Store()
 
                 if not store.get('windows'):
                     store.windows = [None]
@@ -176,3 +183,5 @@ class Window(Widget):
 
         if self._parent is not None:
             self._parent.paint()
+        else:
+            echo(self.term.clear)
