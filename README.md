@@ -1,5 +1,5 @@
 # Tebless
-This library is a collection of elements that supported from blessed allows to create interfaces in a simple way based on events.
+This library is a collection of widgets that supported from blessed allows to create interfaces in a simple way based on events.
 
 ## Install
 
