@@ -9,13 +9,15 @@ from pprint import pformat
 from textwrap import indent
 from logging import debug, basicConfig, DEBUG
 
-def init_debug():
+def init_debug(name=None):
     basicConfig(
         filename='debug.log',
         level=DEBUG,
         filemode='w',
         format="%(msg)s"
     )
+    if name:
+        debug(f'Debugging program: {name}')
     Debug.is_active = True
 
 class Debug(object):
