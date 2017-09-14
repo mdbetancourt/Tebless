@@ -4,7 +4,7 @@
 # https://opensource.org/licenses/MIT
 
 from random import randint
-from tebless.devs import Debug
+from tebless.devs import init_debug
 from tebless.utils import Store
 from tebless.widgets import FilterMenu, Window
 
@@ -22,5 +22,5 @@ def main():
         })
 
 if __name__ == '__main__':
-    with Debug(__file__):
-        main()
+    init_debug()
+    main()

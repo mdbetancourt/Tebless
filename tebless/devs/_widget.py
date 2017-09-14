@@ -4,32 +4,45 @@
 # https://opensource.org/licenses/MIT
 
 import logging
-from blessed import Terminal
+
+from copy import copy
 from events import Events
-from tebless.utils import Store
-from tebless.devs import get_events, echo
+from blessed import Terminal
+from tebless.utils import Store, dict_diff
+from tebless.devs import echo, Debug
 
 class Widget(object):
     """Widget BaseClass.
 
     """
     def __init__(self, cordx=0, cordy=0, width=20, height=1, **kwargs):
-        logging.debug(f"Create a {self} with id {id(self)}: params: {kwargs}")
         self._cordx = round(cordx)
         self._cordy = round(cordy)
         self._width = round(width)
         self._height = round(height)
         self._parent = kwargs.get('parent', None)
         self._term = Terminal()
+
         if self._parent:
             self._store = self._parent.store
         else:
             self._store = kwargs.get('store', Store())
         self.ref = kwargs.get('ref', None)
 
-        def debug(*_):
+        def on_change_debug(*_):
             """ changes debug """
-            logging.debug(f"{self} changes values: {self.__dict__}")
+            if Debug.is_active:
+                _copy = copy(self.__dict__)
+                del _copy['_previous_state']
+
+                msg = dict_diff(self._previous_state, _copy)
+                with Debug(self):
+                    Debug.log('Change', msg)
+
+                self._previous_state = _copy
+
+            self.destroy()
+            self.paint()
 
         events = Events()
 
@@ -39,12 +52,23 @@ class Widget(object):
         self.on_exit = events.on_exit
         self.on_key = events.on_key
 
-        self.on_change += debug
-        self.on_change += self.destroy
-        self.on_change += self.paint
+        self.on_change += on_change_debug
 
-        events = get_events(kwargs)
-        logging.debug(f"{self} events: {events}")
+        events = filter(lambda item: 'on_' in item[0], kwargs.items())
+        events = dict(events)
+        if Debug.is_active:
+            with Debug(self):
+                params = filter(lambda item: 'on_' not in item[0], kwargs.items())
+                params = dict(params)
+                params.update(dict(
+                    cordx=self._cordx,
+                    cordy=self._cordy,
+                    width=self._width,
+                    height=self._height
+                ))
+                Debug.log('Create', params)
+                Debug.log('Events', events)
+
         for key, event in events.items():
             if key == 'on_enter':
                 self.on_enter += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
@@ -56,26 +80,22 @@ class Widget(object):
                 self.on_key += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
             elif key == 'on_change':
                 self.on_change += lambda fn=event, *args, **kwargs: fn(self, *args, **kwargs)
+        self.update()
 
-    def paint(self, *_):
-        """ Print widget in the window """
-        pos = 'x: {self.x}, y: {self.y}, h: {self.height}, w: {self.width}'
-        logging.debug(f"Painted {self} with {id(self)} {pos}")
-        self._paint()
-
-    def destroy(self, *_):
-        """ Destroy widget in the window """
-        pos = 'x: {self.x}, y: {self.y}, h: {self.height}, w: {self.width}'
-        logging.debug(f"Destroy {self} with {id(self)} {pos}")
-        self._destroy()
-
-    def _paint(self):
+    def paint(self):
         raise NotImplementedError("All child class of widget need implement _paint method")
 
-    def _destroy(self):
+    def destroy(self):
         line = (' ' * self.width) + '\n'
         lines = line * self.height
         echo(self.term.move(self.y, self.x) + lines)
+
+    def update(self):
+        if Debug.is_active:
+            _copy = copy(self.__dict__)
+            if '_previous_state' in _copy:
+                del _copy['_previous_state']
+            self._previous_state = _copy
 
     @property
     def parent(self):

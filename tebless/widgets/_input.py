@@ -34,7 +34,8 @@ class Input(Widget):
 
     """
     def __init__(self, text='', label='', max_len=6, *args, **kwargs):
-        Widget.__init__(self, *args, **kwargs)
+        params = dict(text=text, label=label, max_len=round(max_len))
+        Widget.__init__(self, *args, **params, **kwargs)
         self._text = text
         self._label = label
 
@@ -77,7 +78,7 @@ class Input(Widget):
         elif key.code in (BACKSPACE, DEL) and self.value:
             self.value = self.value[:-1]
 
-    def _paint(self):
+    def paint(self):
         text = self._text_style(self.value)
         if len(self.value) < self._max_len:
             text = text + self._cursor

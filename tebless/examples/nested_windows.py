@@ -1,4 +1,4 @@
-from tebless.devs import Debug
+from tebless.devs import init_debug
 from tebless.utils import Store
 from tebless.widgets import Window, Input, FilterMenu, Label
 
@@ -38,5 +38,5 @@ def third_window(window, value):
     window += Label(align='center', text="Third window", width=WIDTH)
 
 if __name__ == '__main__':
-    with Debug(__file__):
-        main()
+    init_debug()
+    main()

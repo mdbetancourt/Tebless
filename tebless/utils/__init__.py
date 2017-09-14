@@ -6,12 +6,29 @@
 # https://opensource.org/licenses/MIT
 
 
-from __future__ import print_function
 from collections import OrderedDict, MutableMapping
-from json import dumps
 from pprint import pprint
-from sys import version_info
 from inspect import ismethod
+
+def dict_diff(first, second):
+    """ Return a dict of keys that differ with another config object.  If a value is
+        not found in one fo the configs, it will be represented by KEYNOTFOUND.
+        @param first:   Fist dictionary to diff.
+        @param second:  Second dicationary to diff.
+        @return diff:   Dict of Key => (first.val, second.val)
+    """
+    diff = {}
+    # Check all keys in first dict
+    for key in first:
+        if key not in second:
+            diff[key] = (first[key], None)
+        elif (first[key] != second[key]):
+            diff[key] = (first[key], second[key])
+    # Check all keys in second dict to find missing
+    for key in second:
+        if key not in first:
+            diff[key] = (None, second[key])
+    return diff
 
 
 class Store(MutableMapping, OrderedDict):

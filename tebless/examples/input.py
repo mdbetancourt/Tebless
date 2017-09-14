@@ -5,8 +5,7 @@
 """Test input.
 
 """
-from tebless.devs import Debug
-from tebless.utils import Store
+from tebless.devs import init_debug
 from tebless.utils.styles import red
 from tebless.widgets import Input, Window, Label
 
@@ -42,5 +41,5 @@ def main():
     view_input()
 
 if __name__ == '__main__':
-    with Debug(__file__):
-        main()
+    init_debug()
+    main()

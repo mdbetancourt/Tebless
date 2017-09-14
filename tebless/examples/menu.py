@@ -3,7 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-from tebless.devs import Debug
+from tebless.devs import init_debug
 from tebless.utils import Store
 from tebless.themes.menu import double
 from tebless.widgets import Menu, Window, Label
@@ -37,5 +37,5 @@ def main():
     view_single_menu()
 
 if __name__ == '__main__':
-    with Debug(__file__):
-        main()
+    init_debug()
+    main()

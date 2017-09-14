@@ -49,10 +49,10 @@ class FilterMenu(Widget):
         item_filter = filter(lambda x: text in self._key(x).lower(), items)
         self._menu.items = item_filter
 
-    def _paint(self):
+    def paint(self):
         self._menu.paint()
         self._input.paint()
 
-    def _destroy(self):
+    def destroy(self):
         self._input.destroy()
         self._menu.destroy()

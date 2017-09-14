@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='tebless',
     packages=find_packages(),
-    version='1.0.3',
+    version='1.1.0',
     description='This library is a collection of widgets that supported from blessed',
     author='Michel Betancourt',
     author_email='MichelBetancourt23@gmail.com',

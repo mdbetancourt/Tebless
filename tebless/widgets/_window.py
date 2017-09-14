@@ -11,7 +11,6 @@ Copyright (c) 2017 ACT. All rights reserved.
 """
 __all__ = ['Window']
 
-
 from events import Events
 from tebless.utils import Store
 from tebless.devs import Widget, echo
@@ -47,7 +46,7 @@ class Window(Widget):
         self.on_exit += self.close
         self.on_key = events.on_key
 
-    def _paint(self):
+    def paint(self):
         echo(self.term.clear)
         for widget in self._widgets:
             widget.paint()
@@ -118,7 +117,7 @@ class Window(Widget):
                 })
             widget.parent = self
             widget.store = self.store
-
+            widget.update()
             #FIXME: Solve if after add element, add a listenner fail
             self.on_enter += widget.on_enter
             self.on_key_arrow += widget.on_key_arrow

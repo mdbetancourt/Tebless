@@ -10,7 +10,8 @@ from tebless.devs import Widget, echo
 
 class Label(Widget):
     def __init__(self, text='Label', align='left', width=20, *args, **kwargs):
-        Widget.__init__(self, width=width, *args, **kwargs)
+        params = dict(text=text, align=align, width=width)
+        Widget.__init__(self, width=width, *args, **params, **kwargs)
         self._text = text
         self._prev = ''
         if align == 'right':
@@ -24,7 +25,7 @@ class Label(Widget):
 
         
 
-    def _paint(self):
+    def paint(self):
         value = self._align(self.value, width=self.width)
         echo(self.term.move(self.y, self.x) + value)
 
@@ -38,7 +39,7 @@ class Label(Widget):
         self._text = text
         self.on_change()
 
-    def _destroy(self):
+    def destroy(self):
         width = self.term.length(self._prev)
         line = (' ' * width) + '\n'
         lines = line * self.height

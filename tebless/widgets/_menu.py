@@ -39,8 +39,8 @@ class Menu(Widget):
 
     """
     def __init__(self, items=None, *args, **kwargs):
-        Widget.__init__(self, *args, **kwargs)
-
+        Widget.__init__(self, items=items, *args, **kwargs)
+        
         self._items = items or []
         self._len_items = len(self._items)
         self._empty = kwargs.get('empty', ['Sin elementos'])
@@ -60,6 +60,7 @@ class Menu(Widget):
         self._page = 1
         self._index = 0
         self._height = 0
+        self.update()
         self.on_key_arrow += self._on_key_arrow
 
 
@@ -70,7 +71,7 @@ class Menu(Widget):
         elif key.code == UP:
             self.index = (self.index - 1) % self._len_items
 
-    def _paint(self):
+    def paint(self):
         self._page = ceil((self._index+1)/self._limit)
 
         echo(self.term.move(self.y, self.x))
