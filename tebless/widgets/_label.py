@@ -11,7 +11,7 @@ from tebless.devs import Widget, echo
 class Label(Widget):
     def __init__(self, text='Label', align='left', width=20, *args, **kwargs):
         params = dict(text=text, align=align, width=width)
-        Widget.__init__(self, width=width, *args, **params, **kwargs)
+        Widget.__init__(self, *args, **params, **kwargs)
         self._text = text
         self._prev = ''
         if align == 'right':
@@ -23,7 +23,6 @@ class Label(Widget):
         else:
             raise ValueError("Only align center, left, right")
 
-        
 
     def paint(self):
         value = self._align(self.value, width=self.width)

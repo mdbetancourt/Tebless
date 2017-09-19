@@ -20,7 +20,7 @@ def view_menu(window):
 
 @Window.decorator(store=store)
 def view_single_menu(window):
-    def update_label(sender, *args):
+    def update_label(sender, *args, **kwargs):
         sender.store.label.value = sender.value
 
     window += Menu(

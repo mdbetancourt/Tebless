@@ -42,6 +42,7 @@ class FilterMenu(Widget):
 
         self.on_key += self._input.on_key
         self.on_key_arrow += self._menu.on_key_arrow
+        self.on_enter += self._menu.on_enter
 
     def _on_change_input(self, *_):
         text = self._input.value.lower()

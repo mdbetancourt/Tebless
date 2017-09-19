@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='tebless',
     packages=find_packages(),
-    version='1.1.0',
+    version='1.1.0', 
     description='This library is a collection of widgets that supported from blessed',
     author='Michel Betancourt',
     author_email='MichelBetancourt23@gmail.com',
@@ -12,6 +12,9 @@ setup(
     download_url='https://github.com/Akhail/Tebless/tarball/1.0',
     keywords='cli python widgets',
     install_requires=['blessed==1.14.2'],
+    dependency_links=[
+        'git+https://github.com/Akhail/events.git'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console :: Curses',

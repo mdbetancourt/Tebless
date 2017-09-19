@@ -39,7 +39,10 @@ class Menu(Widget):
 
     """
     def __init__(self, items=None, *args, **kwargs):
-        Widget.__init__(self, items=items, *args, **kwargs)
+        Widget.__init__(self,
+            items=items,
+            on_key_arrow=self._on_key_arrow,
+            *args, **kwargs)
         
         self._items = items or []
         self._len_items = len(self._items)
@@ -60,8 +63,6 @@ class Menu(Widget):
         self._page = 1
         self._index = 0
         self._height = 0
-        self.update()
-        self.on_key_arrow += self._on_key_arrow
 
 
     def _on_key_arrow(self, *args, **kwargs):

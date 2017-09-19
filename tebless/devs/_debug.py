@@ -30,8 +30,7 @@ class Debug(object):
         if content:
             msg = pformat(content, 2, 80, compact=True)
             debug(f"{label}:\n" + indent(msg, '  '))
-        else:
-            debug(label)
+
 
     def __enter__(self):
         debug(f" < {self._obj} > ".center(80, "="))

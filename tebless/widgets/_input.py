@@ -35,7 +35,7 @@ class Input(Widget):
     """
     def __init__(self, text='', label='', max_len=6, *args, **kwargs):
         params = dict(text=text, label=label, max_len=round(max_len))
-        Widget.__init__(self, *args, **params, **kwargs)
+        Widget.__init__(self, on_key=self._on_key, *args, **params, **kwargs)
         self._text = text
         self._label = label
 
@@ -65,7 +65,6 @@ class Input(Widget):
         elif self.term.length(self._cursor) > 1:
             raise ValueError('cursor need a char')
 
-        self.on_key += self._on_key
 
     def _on_key(self, *_, **kwargs):
         key = kwargs.get('key')

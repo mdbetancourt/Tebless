@@ -117,7 +117,6 @@ class Window(Widget):
                 })
             widget.parent = self
             widget.store = self.store
-            widget.update()
             #FIXME: Solve if after add element, add a listenner fail
             self.on_enter += widget.on_enter
             self.on_key_arrow += widget.on_key_arrow
