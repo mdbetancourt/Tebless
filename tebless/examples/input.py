@@ -17,7 +17,7 @@ def view_input(window):
     """
     store = window.store
 
-    def change_label(sender, *_, **__):
+    def change_label(sender):
         """event func"""
         store.label.value = sender.value
 

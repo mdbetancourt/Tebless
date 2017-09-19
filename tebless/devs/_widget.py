@@ -22,20 +22,20 @@ class Widget(object):
         self._height = round(height)
         self._parent = kwargs.get('parent', None)
         self._term = Terminal()
-
+        Debug.log("Create", f"{self} (x: {cordx}, y: {cordy}, w: {width}, h: {height})")
         if self._parent:
             self._store = self._parent.store
         else:
             self._store = kwargs.get('store', Store())
         self.ref = kwargs.get('ref', None)
 
-        self._events = Events()
+        self._events = Events(default=[self], wrapper=Widget._debug_events)
+        self.on_change += self._on_change
         events_init = filter(lambda x: x[0].startswith('on_'), kwargs.items())
+
         for event_name, callback in events_init:
-            evt = self._events.__getattr__(event_name)
-            evt += self._debug_events
+            evt = self.__getattr__(event_name)
             evt += callback
-            self.__dict__[event_name] = evt
 
     def paint(self):
         raise NotImplementedError("All child class of widget need implement _paint method")
@@ -45,7 +45,7 @@ class Widget(object):
         lines = line * self.height
         echo(self.term.move(self.y, self.x) + lines)
 
-    def on_change(self, *args, **kwargs):
+    def _on_change(self):
         self.destroy()
         self.paint()
 
@@ -62,16 +62,16 @@ class Widget(object):
             return self.__dict__[name]
         elif name.startswith('on_'):
             evt = self._events.__getattr__(name)
-
-            evt += self._debug_events
             self.__dict__[name] = evt
             return evt
         else:
             raise AttributeError(f'{self} object has no attribute {name}')
-    
-    def _debug_events(self, *args, **kwargs):
-        pass
-    
+
+    @staticmethod
+    def _debug_events(func, *args, **kwargs):
+        Debug.log("Trigger event", (func.__name__, args, kwargs))
+        func(*args, **kwargs)
+
     @property
     def term(self):
         return self._term

@@ -16,7 +16,7 @@ def main():
             ref='label'
         )
 
-        def change(sender, *args, **kwargs):
+        def change(sender):
             store.label.value = sender.value
 
         win += FilterMenu({

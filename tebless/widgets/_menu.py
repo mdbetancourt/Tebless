@@ -40,17 +40,19 @@ class Menu(Widget):
     """
     def __init__(self, items=None, *args, **kwargs):
         Widget.__init__(self,
-            items=items,
-            on_key_arrow=self._on_key_arrow,
-            *args, **kwargs)
-        
+                        items=items,
+                        on_key_arrow=self._on_key_arrow,
+                        *args, **kwargs)
+
         self._items = items or []
         self._len_items = len(self._items)
         self._empty = kwargs.get('empty', ['Sin elementos'])
         self._is_menu = kwargs.get('is_menu', True)
         self._limit = round(kwargs.get('limit', 4))
+
         if not 'width' in kwargs:
             self._width = self.term.width
+
         self._header = kwargs.get('header', '')
         self._footer = kwargs.get('footer', '')
 
@@ -64,9 +66,7 @@ class Menu(Widget):
         self._index = 0
         self._height = 0
 
-
-    def _on_key_arrow(self, *args, **kwargs):
-        key = kwargs.get('key')
+    def _on_key_arrow(self, key):
         if key.code == DOWN:
             self.index = (self.index + 1) % self._len_items
         elif key.code == UP:
@@ -109,7 +109,7 @@ class Menu(Widget):
                 echo(self.term.move_x(self.x))
                 tmp = self._formater(**{
                     'text': text,
-                    'index': index, 
+                    'index': index,
                     'lenght': len(array_text)
                 })
                 pos = self._index % self._limit == idx
@@ -129,7 +129,6 @@ class Menu(Widget):
             echo(self._footer.format(**vars_op))
         self._height += footer_height
 
-
     @property
     def value(self):
         return self.items[self._index]
@@ -137,7 +136,7 @@ class Menu(Widget):
     @property
     def index(self):
         return self._index
-    
+
     @index.setter
     def index(self, value):
         self._index = value
@@ -146,7 +145,6 @@ class Menu(Widget):
     @property
     def items(self):
         return list(self._items)
-    
 
     @items.setter
     def items(self, value):

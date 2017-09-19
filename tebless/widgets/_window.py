@@ -52,7 +52,7 @@ class Window(Widget):
             widget.paint()
 
 
-    def close(self, *args, **kwargs):
+    def close(self):
         self._listen = False
 
     def listen(self):
