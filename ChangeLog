@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+1.1.2
+-----
+
+* new feature hot components load and added main argument decorator
 * Added new feature colors and change filter menu function
 * bugfix on call event function & added authors and changelog
 * Fix minor issues and add dependency
