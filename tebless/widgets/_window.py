@@ -37,6 +37,7 @@ class Window(Widget):
         if not isinstance(self.store, Store):
             raise TypeError("Store is invalid")
 
+        self._is_active = False
         self._listen = True
         self._widgets = []
         events = Events()
@@ -104,7 +105,7 @@ class Window(Widget):
             if not isinstance(widgets, Widget):
                 raise TypeError("Only Widgets and list of widgets")
             widgets = [widgets]
-        
+
         for widget in widgets:
             if not isinstance(widget, Widget):
                 raise TypeError("Only Widgets")
@@ -124,6 +125,8 @@ class Window(Widget):
             self.on_key += widget.on_key
 
             self._widgets.append(widget)
+            if self._is_active:
+                widget.paint()
         return self
 
     @staticmethod
@@ -154,6 +157,8 @@ class Window(Widget):
                         raise RuntimeError("Window width is insufficient")
                     func(win, *args, **kwargs)
                 store.windows.remove(tmp)
+            if d_wargs.get('main', False) is True:
+                wrapper()
             return wrapper
         if function:
             return _decorator(function)
@@ -171,6 +176,7 @@ class Window(Widget):
     def __exit__(self, _type, _value, _traceback):
         if not self._widgets:
             raise IndexError('Not widgets found')
+        self._is_active = True
         if self._parent is None:
             with self.term.cbreak(), self.term.hidden_cursor():
                 self.paint()

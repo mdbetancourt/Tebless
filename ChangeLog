@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* Added new feature colors and change filter menu function
+* bugfix on call event function & added authors and changelog
 * Fix minor issues and add dependency
 * Added filename on debug
 
