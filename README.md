@@ -1,4 +1,5 @@
 # Tebless
+[![Build Status](https://travis-ci.org/Akhail/Tebless.svg?branch=master)](https://travis-ci.org/Akhail/Tebless)
 This library is a collection of widgets that supported from blessed allows to create interfaces in a simple way based on events.
 
 ## Table of contents
