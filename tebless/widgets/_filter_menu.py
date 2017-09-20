@@ -19,9 +19,8 @@ from tebless.devs import Widget
 from tebless.widgets import Input, Menu
 
 class FilterMenu(Widget):
-    def __init__(self, s_input, s_menu, *args, **kwargs):
+    def __init__(self, s_input, s_menu, filter_items=None, *args, **kwargs):
         Widget.__init__(self, *args, **kwargs)
-        self._key = kwargs.get('key', s_menu.get('key', lambda x: x))
         self._text = ''
         events = Events()
         self.on_select = events.on_select
@@ -35,7 +34,7 @@ class FilterMenu(Widget):
 
         _s_menu.update(s_menu)
         _s_input.update(s_input)
-
+        self._filter = filter_items
         self._input = Input(**_s_input)
         self._menu = Menu(**_s_menu)
         self._items = list(self._menu.items)
@@ -46,8 +45,11 @@ class FilterMenu(Widget):
 
     def _on_change_input(self, *_):
         text = self._input.value.lower()
-        items = self._items
-        item_filter = filter(lambda x: text in self._key(x).lower(), items)
+        def filt(text, items):
+            return filter(lambda item: text.lower() in item.lower(), items)
+        _filter = self._filter or filt
+
+        item_filter = _filter(text, self._items.copy())
         self._menu.items = item_filter
 
     def paint(self):

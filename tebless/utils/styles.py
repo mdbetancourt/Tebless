@@ -8,7 +8,7 @@
 """
 import blessed
 from tebless.utils.constants import TERM
-__all__ = ['green', 'yellow', 'red', 'blue']
+__all__ = ['green', 'yellow', 'red', 'blue', 'white', 'underline', 'bold', 'underline_ns']
 
 green = TERM.green
 yellow = TERM.yellow
@@ -16,6 +16,7 @@ red = TERM.red
 white = TERM.white
 blue = TERM.blue
 underline = TERM.underline
+bold = TERM.bold
 
 def underline_ns(text):
     tmp = text.strip(' ')
