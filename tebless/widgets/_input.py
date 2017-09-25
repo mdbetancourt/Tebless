@@ -15,7 +15,7 @@ __all__ = ['Input']
 
 import re
 from tebless.devs import Widget, echo
-from tebless.utils.constants import BACKSPACE, DEL
+from tebless.utils.constants import KEY_BACKSPACE, KEY_DELETE
 
 class Input(Widget):
     """Input widget with label.
@@ -74,7 +74,7 @@ class Input(Widget):
         #TODO: Add event on fail validation
         if correct_len and validations:
             self.value += key
-        elif key.code in (BACKSPACE, DEL) and self.value:
+        elif key.code in (KEY_BACKSPACE, KEY_DELETE) and self.value:
             self.value = self.value[:-1]
 
     def paint(self):

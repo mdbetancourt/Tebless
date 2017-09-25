@@ -7,8 +7,8 @@
 
 """
 import blessed
-from tebless.utils.constants import TERM
 __all__ = ['green', 'yellow', 'red', 'blue', 'white', 'underline', 'bold', 'underline_ns']
+TERM = blessed.Terminal()
 
 green = TERM.green
 yellow = TERM.yellow

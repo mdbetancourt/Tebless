@@ -15,7 +15,7 @@ from math import floor, ceil
 
 from tebless.utils.styles import red
 from tebless.devs import Widget, echo
-from tebless.utils.constants import DOWN, UP
+from tebless.utils.constants import KEY_DOWN, KEY_UP
 
 __all__ = ['Menu']
 
@@ -67,9 +67,9 @@ class Menu(Widget):
         self._height = 0
 
     def _on_key_arrow(self, key):
-        if key.code == DOWN:
+        if key.code == KEY_DOWN:
             self.index = (self.index + 1) % self._len_items
-        elif key.code == UP:
+        elif key.code == KEY_UP:
             self.index = (self.index - 1) % self._len_items
 
     def paint(self):

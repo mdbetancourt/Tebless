@@ -14,7 +14,7 @@ __all__ = ['Window']
 from events import Events
 from tebless.utils import Store
 from tebless.devs import Widget, echo
-from tebless.utils.constants import ENTER, ESC, DOWN, UP
+from tebless.utils.constants import KEY_ENTER, KEY_ESCAPE, KEY_DOWN, KEY_UP
 
 class Window(Widget):
     """Class that encapsulates a whole window and allows to own the elements inside.
@@ -64,11 +64,11 @@ class Window(Widget):
             key = u''
             key = self.term.inkey(timeout=0.2)
             try:
-                if key.code == ENTER:
+                if key.code == KEY_ENTER:
                     self.on_enter(key=key)
-                elif key.code in (DOWN, UP):
+                elif key.code in (KEY_DOWN, KEY_UP):
                     self.on_key_arrow(key=key)
-                elif key.code == ESC or key == chr(3):
+                elif key.code == KEY_ESCAPE or key == chr(3):
                     self.on_exit(key=key)
                 elif key != '':
                     self.on_key(key=key)
@@ -88,10 +88,10 @@ class Window(Widget):
 
         """
         ins_widget = widget(*args, **kwargs)
-        self.__add__(ins_widget)
+        self.__iadd__(ins_widget)
         return ins_widget
 
-    def __add__(self, widgets):
+    def __iadd__(self, widgets):
         """Insert new element.
 
         Usage:
