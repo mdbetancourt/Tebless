@@ -11,32 +11,48 @@ Copyright (c) 2017 ACT. All rights reserved.
 """
 __all__ = ['Window']
 
+from time import sleep
+from threading import Thread
+from functools import partial
+
 from events import Events
 from tebless.utils import Store
 from tebless.devs import Widget, echo
-from tebless.utils.constants import KEY_ENTER, KEY_ESCAPE, KEY_DOWN, KEY_UP
+from tebless.utils.keyboard import KEY_ENTER, KEY_ESCAPE, KEY_DOWN, KEY_UP
 
 class Window(Widget):
     """Class that encapsulates a whole window and allows to own the elements inside.
 
-    Usage:
-        With Window (store) as window:
-            Window += element
-    Or:
-        With Window (store) as window:
-            Window.add(element, properties)
-    Params:
-        store - Global storage is necessary
-        parent - If you do not provider it is the main window
+    :param store: Global storage is necessary
+    :param parent: If you do not provider it is the main window
+    :type store: Store
+    :type parent: Window
+
+    :example:
+
+    >>> with Window (store) as window:
+    ...     Window += element
 
     """
     def __init__(self, *args, **kwargs):
-        Widget.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._width, self._height = self.term.width, self.term.height
 
         if not isinstance(self.store, Store):
             raise TypeError("Store is invalid")
 
+        def worker(func, time):
+            sleep(time)
+            func()
+
+        def timeout(func, *args, **kwargs):
+            timeout = kwargs.pop('time', None)
+            if timeout is None:
+                raise TypeError("take two arguments func and time")
+            thread = Thread(target=worker, args=(partial(func, *args, **kwargs), timeout))
+            thread.start()
+
+        self.timeout = timeout
         self._is_active = False
         self._listen = True
         self._widgets = []
@@ -54,6 +70,9 @@ class Window(Widget):
 
 
     def close(self):
+        """Close this window.
+
+        """
         self._listen = False
 
     def listen(self):

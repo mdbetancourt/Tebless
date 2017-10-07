@@ -6,18 +6,22 @@
 """Colors funtions for terminal.
 
 """
+import sys
 import blessed
-__all__ = ['green', 'yellow', 'red', 'blue', 'white', 'underline', 'bold', 'underline_ns']
+
 TERM = blessed.Terminal()
 
-green = TERM.green
-yellow = TERM.yellow
-red = TERM.red
-white = TERM.white
-blue = TERM.blue
-underline = TERM.underline
-bold = TERM.bold
+class Style(object):
+    def __getattr__(self, name):
+        formatters = blessed.formatters.split_compound(name)
+        compoundables, colors = blessed.formatters.COMPOUNDABLES, blessed.formatters.COLORS
+        if name in colors or all(fmt in compoundables for fmt in formatters):
+            return TERM.__getattr__(name)
+        else:
+            raise AttributeError(f"type object 'Style' has no attribute '{name}'")
 
-def underline_ns(text):
-    tmp = text.strip(' ')
-    return text.replace(tmp, underline(tmp))
+    def underline_ns(self, text):
+        tmp = text.strip(' ')
+        return text.replace(tmp, Style().underline(tmp))
+
+sys.modules[__name__] = Style()

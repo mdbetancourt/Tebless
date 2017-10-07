@@ -15,34 +15,31 @@ from math import floor, ceil
 
 from tebless.utils.styles import red
 from tebless.devs import Widget, echo
-from tebless.utils.constants import KEY_DOWN, KEY_UP
+from tebless.utils.keyboard import KEY_DOWN, KEY_UP
 
 __all__ = ['Menu']
 
 class Menu(Widget):
     """Widget show a list of elements.
 
-    Params:
-        parent - If you do not provider it is the main window
-        cordx - Position on axis X
-        cordy - Position on axis Y
-        items - Element to show
-        is_menu - Is a menu or only show items
-        limit - Max items to show
-        header - Text header of table
-        footer - Text footer of table
-        selector - A function that return text to show on select
-        width - Width of table
-        empty - Whats show if table is empty
-        key - A function return text of object in list
+    :param cordx: Position on axis X
+    :param cordy: Position on axis Y
+    :param items: Element to show
+    :param is_menu: Is a menu or only show items
+    :param limit: Max items to show
+    :param header: Text header of table
+    :param footer: Text footer of table
+    :param selector: A function that return text to show on select
+    :param width: Width of table
+    :param empty: Whats show if table is empty
+    :param key: A function return text of object in list
 
 
     """
     def __init__(self, items=None, *args, **kwargs):
-        Widget.__init__(self,
-                        items=items,
-                        on_key_arrow=self._on_key_arrow,
-                        *args, **kwargs)
+        super().__init__(items=items,
+                         on_key_arrow=self._on_key_arrow,
+                         *args, **kwargs)
 
         self._items = items or []
         self._len_items = len(self._items)

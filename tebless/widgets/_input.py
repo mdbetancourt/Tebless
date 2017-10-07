@@ -2,45 +2,62 @@
 # 
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
+"""Input Label.
 
+This module contains the Label Input
 """
-    input.py
 
-
-
-    Created by Michel Betancourt on 2017.
-    Copyright (c) 2017 ACT. All rights reserved.
-"""
 __all__ = ['Input']
 
 import re
 from tebless.devs import Widget, echo
-from tebless.utils.constants import KEY_BACKSPACE, KEY_DELETE
+from tebless.utils.keyboard import KEY_BACKSPACE, KEY_DELETE
 
 class Input(Widget):
     """Input widget with label.
 
-    Params:
-        text: str -- placeholder text
-        label: str -- Desc of input
-        align: styles -- center, ljust, rjust text
-        fill_c: str -- blank space
-        cursor: str -- pointer
-        left_l: str -- left terminator
-        right_l: str -- right terminator
-        max_len: int -- max string lenght
-        validation: regex -- a regex string to validate input
-        text_style: func -- apply to text
+    :param text: placeholder text
+    :param label: Desc of input
+    :param align: center, ljust, rjust text
+    :param fill_c: blank space
+    :param cursor: pointer
+    :param left_l: left terminator
+    :param right_l: right terminator
+    :param max_len: max string length
+    :param validation: a regex string to validate input
+    :param text_style: apply to text
+    :type text: str
+    :type label: str
+    :type align: str
+    :type fill_c: str
+    :type cursor: str
+    :type left_l: str
+    :type right_l: str
+    :type max_len: int
+    :type validation: regex
+    :type text_style: func
+
+    :Example:
+
+    >>> from tebless.widgets import Input, Window
+    >>> @Window.decorator(main=True)
+    ... def view(window):
+    ...     window += Input(label="Insert text", cordx=2,
+    ...                     cordy=2, width=10, align='center')
 
     """
-    def __init__(self, text='', label='', max_len=6, *args, **kwargs):
+    def __init__(self,
+                 text='',
+                 label='',
+                 align='left',
+                 max_len=6,
+                 *args, **kwargs):
         params = dict(text=text, label=label, max_len=round(max_len))
-        Widget.__init__(self, on_key=self._on_key, *args, **params, **kwargs)
+        super().__init__(on_key=self._on_key, *args, **params, **kwargs)
         self._text = text
         self._label = label
 
         self._max_len = round(max_len)
-        align = kwargs.get('align', 'left')
         self._fill_c = kwargs.get('fill_c', '_')
         self._cursor = kwargs.get('cursor', '_')
 
@@ -68,7 +85,7 @@ class Input(Widget):
 
     def _on_key(self, *_, **kwargs):
         key = kwargs.get('key')
-        correct_len = len(self.value) < self._max_len
+        correct_len = self.term.length(self.value) < self._max_len
         validations = re.match(self._validation, key) and key.isprintable()
 
         #TODO: Add event on fail validation
@@ -79,18 +96,18 @@ class Input(Widget):
 
     def paint(self):
         text = self._text_style(self.value)
-        if len(self.value) < self._max_len:
+        if self.term.length(self.value) < self._max_len:
             text = text + self._cursor
         text = self._align(text, fillchar=self._fill_c, width=self._max_len)
 
         input_field = self._left_l + text + self._right_l # [_______]
 
-        echo(self.term.move(self.y, self.x) + self._label + input_field) # label 
+        echo(self.term.move(self.y, self.x) + self._label + input_field) # label
 
     @property
     def width(self):
-        len_widget = len(self._label) + len(self._right_l)
-        len_widget += len(self._left_l) + self._max_len
+        len_widget = self.term.length(self._label) + self.term.length(self._right_l)
+        len_widget += self.term.length(self._left_l) + self._max_len
         return len_widget
 
     @property
