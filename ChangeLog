@@ -1,6 +1,8 @@
 CHANGES
 =======
 
+* Fixed small bugs and added a lot of keys
+* Added tests and travis image
 * Update README & Added travis and requirements
 
 1.1.2
