@@ -9,7 +9,6 @@ This module contains the Label widget
 
 __all__ = ['Label']
 
-import logging
 from functools import partial
 from tebless.devs import Widget, echo
 
@@ -40,19 +39,15 @@ class Label(Widget):
     def __init__(self,
                  text='Label',
                  align='left',
-                 width=None,
+                 width=20,
                  height=1,
-                 wrap=True,
                  *args, **kwargs):
         params = dict(text=text, align=align, width=width or 20, height=height or 0)
         super().__init__(*args, **params, **kwargs)
 
         self._text = text
         self._prev = ''
-        self._wrap = self.term.wrap if wrap else (lambda x, **kw: [x])
-
-        if width is not None and not wrap:
-            logging.warning('Warning width ignore is wrap == False')
+        self._wrap = (lambda x, **kw: [x]) if width is None else self.term.wrap
 
         if align == 'right':
             self._align = self.term.rjust
@@ -63,15 +58,14 @@ class Label(Widget):
         else:
             raise ValueError("Only align center, left, right")
 
-
     def paint(self):
         wrapped = self._wrap(self.value, width=self.width)[:self.height]
         wrapped = map(partial(self._align, width=self.width), wrapped)
-        wrapped = [
+        wrapped = ''.join(
             self.term.move(idx + self.y, self.x) + value
             for idx, value in enumerate(wrapped)
-        ]
-        echo(''.join(wrapped))
+        )
+        echo(wrapped)
 
     @property
     def value(self):
@@ -84,9 +78,11 @@ class Label(Widget):
         self.on_change()
 
     def destroy(self):
-        width = self.term.length(self._prev)
-        line = ' ' * width
-        lines = ''.join([self.term.move(self.x, self.y+idx) + line for idx in range(self.height)])
+        wrapped_text = self._wrap(self._prev, width=self.width)[:self.height]
+        lines = ''.join(
+            self.term.move(idx + self.y, self.x) + ' ' * self.term.length(text)
+            for idx, text in enumerate(wrapped_text)
+        )
         echo(lines)
 
     @property

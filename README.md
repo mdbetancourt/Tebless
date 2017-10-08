@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/tebless.svg?style=flat-square)](https://pypi.python.org/pypi?:action=display&name=tebless&version=1.1.1.dev3)
 [![Github All Releases](https://img.shields.io/github/downloads/akhail/tebless/total.svg?style=flat-square&colorB=F0A30A)]()
 [![GitHub tag](https://img.shields.io/github/tag/akhail/tebless.svg?style=flat-square)](https://github.com/Akhail/Tebless/tags)
-[![](https://img.shields.io/github/issues-raw/akhail/tebless.svg?style=flat-square)](https://github.com/Akhail/Tebless/issues)
+[![Issues](https://img.shields.io/github/issues-raw/akhail/tebless.svg?style=flat-square)](https://github.com/Akhail/Tebless/issues)
 [![PyPI](https://img.shields.io/pypi/l/tebless.svg?style=flat-square&colorB=9A59B5)](https://github.com/Akhail/Tebless/blob/master/LICENSE)
 
 This library is a collection of widgets that supported from blessed allows to create interfaces in a simple way based on events.

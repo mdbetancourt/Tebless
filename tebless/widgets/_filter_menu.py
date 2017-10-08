@@ -19,14 +19,41 @@ from tebless.devs import Widget
 from tebless.widgets import Input, Menu
 
 class FilterMenu(Widget):
-    def __init__(self, s_input, s_menu, filter_items=None, *args, **kwargs):
-        Widget.__init__(self, *args, **kwargs)
+    """Widget with label and menu.
+
+    Create a new widget :class:`FilterMenu`
+
+    :param s_input: :class:`Input` options.
+    :param s_menu: :class:`Menu` options.
+    :param filter_items: function receive text, items filter and return result.
+    :type s_input: Input
+    :type s_menu: Menu
+    :type filter_items: function
+
+    >>> from tebless.widgets import Label, Window, Input, FilterMenu
+    ... @Window.decorator
+    ... def view(window):
+    ...     window += FilterMenu({
+    ...         'label': "Search: "
+    ...     },{
+    ...         'items': [str(x) for x in range(100)]
+    ...     })
+    ... view()
+
+    """
+    def __init__(self,
+                 s_input,
+                 s_menu,
+                 filter_items=None,
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._text = ''
         events = Events()
         self.on_select = events.on_select
 
         _s_menu = {
-            'on_enter': self.on_select
+            'on_enter': self.on_select,
+            'cordy': 1
         }
         _s_input = {
             'on_change': self._on_change_input

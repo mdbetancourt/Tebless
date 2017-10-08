@@ -1,6 +1,9 @@
 CHANGES
 =======
 
+* fix bugs in label and minor bug in filter_menu
+* change constants to keyboard and add all styles
+* Clean the code
 * Fixed small bugs and added a lot of keys
 * Added tests and travis image
 * Update README & Added travis and requirements
