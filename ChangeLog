@@ -2,6 +2,7 @@ CHANGES
 =======
 
 * Fix dependencies
+* Fix dependencies
 * fix bugs in label and minor bug in filter\_menu
 * news features in label widget
 * change constants to keyboard and add all styles

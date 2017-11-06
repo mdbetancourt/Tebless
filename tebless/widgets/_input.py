@@ -83,8 +83,7 @@ class Input(Widget):
             raise ValueError('cursor need a char')
 
 
-    def _on_key(self, *_, **kwargs):
-        key = kwargs.get('key')
+    def _on_key(self, key):
         correct_len = self.term.length(self.value) < self._max_len
         validations = re.match(self._validation, key) and key.isprintable()
 
