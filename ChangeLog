@@ -1,7 +1,9 @@
 CHANGES
 =======
 
-* fix bugs in label and minor bug in filter_menu
+* Fix dependencies
+* fix bugs in label and minor bug in filter\_menu
+* news features in label widget
 * change constants to keyboard and add all styles
 * Clean the code
 * Fixed small bugs and added a lot of keys
