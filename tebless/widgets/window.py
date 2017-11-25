@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
@@ -20,6 +20,7 @@ from tebless.utils import Store
 from tebless.devs import Widget, echo
 from tebless.utils.keyboard import KEY_ENTER, KEY_ESCAPE, KEY_DOWN, KEY_UP
 
+
 class Window(Widget):
     """Class that encapsulates a whole window and allows to own the elements inside.
 
@@ -34,6 +35,7 @@ class Window(Widget):
     ...     Window += element
 
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._width, self._height = self.term.width, self.term.height
@@ -49,7 +51,8 @@ class Window(Widget):
             timeout = kwargs.pop('time', None)
             if timeout is None:
                 raise TypeError("take two arguments func and time")
-            thread = Thread(target=worker, args=(partial(func, *args, **kwargs), timeout))
+            thread = Thread(target=worker, args=(
+                partial(func, *args, **kwargs), timeout))
             thread.start()
 
         self.timeout = timeout
@@ -67,7 +70,6 @@ class Window(Widget):
         echo(self.term.clear)
         for widget in self._widgets:
             widget.paint()
-
 
     def close(self):
         """Close this window.
@@ -93,8 +95,6 @@ class Window(Widget):
                     self.on_key(key=key)
             except KeyboardInterrupt:
                 self.on_exit(key=key)
-
-
 
     def add(self, widget, *args, **kwargs):
         """Insert new element.
@@ -131,13 +131,13 @@ class Window(Widget):
             if widget.ref:
                 name = widget.ref
                 if name in self.store:
-                    raise KeyError(f'{name} key already exist')
+                    raise KeyError(name + ' key already exist')
                 self.store.update({
                     name: widget
                 })
             widget.parent = self
             widget.store = self.store
-            #FIXME: Solve if after add element, add a listenner fail
+            # FIXME: Solve if after add element, add a listenner fail
             self.on_enter += widget.on_enter
             self.on_key_arrow += widget.on_key_arrow
             self.on_exit += widget.on_exit
@@ -187,7 +187,7 @@ class Window(Widget):
     def size(self):
         """ Height and Width of window. """
         return self._width, self._height
-    
+
     def __enter__(self):
         echo(self.term.clear)
         return self

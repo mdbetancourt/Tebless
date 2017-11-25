@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
@@ -19,6 +19,7 @@ from tebless.utils.keyboard import KEY_DOWN, KEY_UP
 
 __all__ = ['Menu']
 
+
 class Menu(Widget):
     """Widget show a list of elements.
 
@@ -36,6 +37,7 @@ class Menu(Widget):
 
 
     """
+
     def __init__(self, items=None, *args, **kwargs):
         super().__init__(items=items,
                          on_key_arrow=self._on_key_arrow,
@@ -58,7 +60,8 @@ class Menu(Widget):
 
         self._selector = kwargs.get('selector', selector)
         self._key = kwargs.get('key', lambda x: x)
-        self._formater = kwargs.get('formater', lambda text, **kw: '  ' + text[:self._width])
+        self._formater = kwargs.get(
+            'formater', lambda text, **kw: '  ' + text[:self._width])
         self._page = 1
         self._index = 0
         self._height = 0
@@ -70,7 +73,7 @@ class Menu(Widget):
             self.index = (self.index - 1) % self._len_items
 
     def paint(self):
-        self._page = ceil((self._index+1)/self._limit)
+        self._page = ceil((self._index + 1) / self._limit)
 
         echo(self.term.move(self.y, self.x))
 
@@ -81,10 +84,10 @@ class Menu(Widget):
             footer_height = len(self._footer.split('\n'))
 
         items = self.items if self.items else self._empty
-        first = floor(self._index/self._limit)*self._limit
+        first = floor(self._index / self._limit) * self._limit
         max_page = ceil(len(items) / self._limit)
 
-        items = items[first:self._limit+first]
+        items = items[first:self._limit + first]
 
         vars_op = {
             'page': self._page,
@@ -92,12 +95,12 @@ class Menu(Widget):
             'count': self._len_items
         }
 
-        ## Print header
+        # Print header
         if self._header != '':
             echo(self._header.format(**vars_op) + '\n')
         self._height = header_height
 
-        ## Print elements
+        # Print elements
         for idx, item in enumerate(items):
             array_text = self._key(item)
             if isinstance(array_text, str):
@@ -120,7 +123,7 @@ class Menu(Widget):
                 self._height += tmp.count('\n')
                 echo(tmp)
 
-        ## Print footer
+        # Print footer
         if self._footer != '':
             echo(self.term.move_x(self.x))
             echo(self._footer.format(**vars_op))

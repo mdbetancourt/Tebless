@@ -1,3 +1,2 @@
 blessed
 git+https://github.com/Akhail/events.git#egg=events
-pytest

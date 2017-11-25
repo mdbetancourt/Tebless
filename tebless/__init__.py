@@ -1,5 +1,7 @@
-# Copyright (c) 2017 Michel Betancourt
-# 
-# This software is released under the MIT License.
-# https://opensource.org/licenses/MIT
+# -*- coding: utf-8 -*-
 
+"""Top-level package for Tebless."""
+
+__author__ = """Michel Betancourt"""
+__email__ = 'MichelBetancourt23@gmail.com'
+__version__ = '1.2.0'

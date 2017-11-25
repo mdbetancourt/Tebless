@@ -2,9 +2,9 @@
 
 """
 
-from ._window import Window
-from ._menu import Menu
-from ._input import Input
-from ._filter_menu import FilterMenu
-from ._label import Label
-from ._checkbox import CheckBox
+from .window import Window
+from .menu import Menu
+from .input import Input
+from .checkbox import CheckBox
+from .filter_menu import FilterMenu
+from .label import Label

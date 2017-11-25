@@ -34,11 +34,13 @@ def view_input(window):
         ref='label'
     )
 
+
 def main():
     """Main.
 
     """
     view_input()
+
 
 if __name__ == '__main__':
     init_debug()

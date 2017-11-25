@@ -1,11 +1,12 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
 from tebless.devs import echo
-from tebless.utils.keyboard import KEY_F1 # pylint: disable=E0611
+from tebless.utils.keyboard import KEY_F1  # pylint: disable=E0611
 from tebless.devs import Widget
+
 
 class CheckBox(Widget):
     def __init__(self,
@@ -37,7 +38,7 @@ class CheckBox(Widget):
     @label.setter
     def label(self, value):
         self._label = value
-        self.on_change() # pylint: disable=E1101
+        self.on_change()  # pylint: disable=E1101
 
     @property
     def value(self):
@@ -48,4 +49,4 @@ class CheckBox(Widget):
         if not isinstance(value, bool):
             raise TypeError('Only supported boolean')
         self._state = value
-        self.on_change() # pylint: disable=E1101
+        self.on_change()  # pylint: disable=E1101

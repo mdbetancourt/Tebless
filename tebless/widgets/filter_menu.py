@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
@@ -17,6 +17,7 @@ __all__ = ['FilterMenu']
 from events import Events
 from tebless.devs import Widget
 from tebless.widgets import Input, Menu
+
 
 class FilterMenu(Widget):
     """Widget with label and menu.
@@ -41,6 +42,7 @@ class FilterMenu(Widget):
     ... view()
 
     """
+
     def __init__(self,
                  s_input,
                  s_menu,
@@ -72,6 +74,7 @@ class FilterMenu(Widget):
 
     def _on_change_input(self, *_):
         text = self._input.value.lower()
+
         def filt(text, items):
             return filter(lambda item: text.lower() in item.lower(), items)
         _filter = self._filter or filt

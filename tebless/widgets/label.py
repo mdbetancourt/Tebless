@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 """Widget Label.
@@ -11,6 +11,7 @@ __all__ = ['Label']
 
 from functools import partial
 from tebless.devs import Widget, echo
+
 
 class Label(Widget):
     """Print text in window.
@@ -36,13 +37,15 @@ class Label(Widget):
     ...                     cordy=2, width=10, height=2, align='center')
 
     """
+
     def __init__(self,
                  text='Label',
                  align='left',
                  width=20,
                  height=1,
                  *args, **kwargs):
-        params = dict(text=text, align=align, width=width or 20, height=height or 0)
+        params = dict(text=text, align=align,
+                      width=width or 20, height=height or 0)
         super().__init__(*args, **params, **kwargs)
 
         self._text = text

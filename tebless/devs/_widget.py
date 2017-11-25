@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
@@ -11,10 +11,12 @@ from blessed import Terminal
 from tebless.utils import Store, dict_diff
 from tebless.devs import echo, Debug
 
+
 class Widget(object):
     """Widget BaseClass.
 
     """
+
     def __init__(self, cordx=0, cordy=0, width=20, height=1, **kwargs):
         self._cordx = round(cordx)
         self._cordy = round(cordy)
@@ -22,7 +24,8 @@ class Widget(object):
         self._height = round(height)
         self._parent = kwargs.get('parent', None)
         self._term = Terminal()
-        Debug.log("Create", f"{self} (x: {cordx}, y: {cordy}, w: {width}, h: {height})")
+        Debug.log("Create", str(self) +
+                  " (x: {cordx}, y: {cordy}, w: {width}, h: {height})")
         if self._parent:
             self._store = self._parent.store
         else:
@@ -38,7 +41,8 @@ class Widget(object):
             evt += callback
 
     def paint(self):
-        raise NotImplementedError("All child class of widget need implement _paint method")
+        raise NotImplementedError(
+            "All child class of widget need implement _paint method")
 
     def destroy(self):
         line = (' ' * self.width) + '\n'

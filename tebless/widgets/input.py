@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Michel Betancourt
-# 
+#
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 """Input Label.
@@ -12,6 +12,7 @@ __all__ = ['Input']
 import re
 from tebless.devs import Widget, echo
 from tebless.utils.keyboard import KEY_BACKSPACE, KEY_DELETE
+
 
 class Input(Widget):
     """Input widget with label.
@@ -46,6 +47,7 @@ class Input(Widget):
     ...                     cordy=2, width=10, align='center')
 
     """
+
     def __init__(self,
                  text='',
                  label='',
@@ -82,12 +84,11 @@ class Input(Widget):
         elif self.term.length(self._cursor) > 1:
             raise ValueError('cursor need a char')
 
-
     def _on_key(self, key):
         correct_len = self.term.length(self.value) < self._max_len
         validations = re.match(self._validation, key) and key.isprintable()
 
-        #TODO: Add event on fail validation
+        # TODO: Add event on fail validation
         if correct_len and validations:
             self.value += key
         elif key.code in (KEY_BACKSPACE, KEY_DELETE) and self.value:
@@ -99,13 +100,15 @@ class Input(Widget):
             text = text + self._cursor
         text = self._align(text, fillchar=self._fill_c, width=self._max_len)
 
-        input_field = self._left_l + text + self._right_l # [_______]
+        input_field = self._left_l + text + self._right_l  # [_______]
 
-        echo(self.term.move(self.y, self.x) + self._label + input_field) # label
+        echo(self.term.move(self.y, self.x) +
+             self._label + input_field)  # label
 
     @property
     def width(self):
-        len_widget = self.term.length(self._label) + self.term.length(self._right_l)
+        len_widget = self.term.length(
+            self._label) + self.term.length(self._right_l)
         len_widget += self.term.length(self._left_l) + self._max_len
         return len_widget
 

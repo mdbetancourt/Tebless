@@ -2,6 +2,7 @@ from tebless.widgets import Window, CheckBox, Label
 from tebless.utils.styles import green
 from tebless.utils.keyboard import KEY_F2, KEY_F3
 
+
 @Window.decorator
 def main(window):
     WIDTH, HEIGHT = window.size
@@ -15,5 +16,6 @@ def main(window):
                        check=lambda state: '(O)' if state else '( )'
                        )
 
+
 if __name__ == '__main__':
-    main() # pylint: disable=E1120
+    main()  # pylint: disable=E1120
