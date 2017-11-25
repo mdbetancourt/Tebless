@@ -7,22 +7,18 @@ from setuptools import setup, find_packages
 from tebless import __version__, __email__, __author__
 
 with open('README.rst') as readme_file:
-    readme = readme_file.read()
+    readme = readme_file.read() # pylint: disable=C0103
 
 with open('HISTORY.rst') as history_file:
-    history = history_file.read()
+    history = history_file.read()  # pylint: disable=C0103
 
-requirements = [
+requirements = [  # pylint: disable=C0103
     'blessed'
 ]
 
-setup_requirements = [
-    # TODO(akhail): put setup requirements (distutils extensions, etc.) here
-]
+setup_requirements = []  # pylint: disable=C0103
 
-test_requirements = [
-    # TODO: put package test requirements here
-]
+test_requirements = []  # pylint: disable=C0103
 
 setup(
     name='tebless',
