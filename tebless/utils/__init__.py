@@ -7,16 +7,16 @@
 
 
 from collections import OrderedDict, MutableMapping
-from pprint import pprint
 from inspect import ismethod
 
 
 def dict_diff(first, second):
-    """ Return a dict of keys that differ with another config object.  If a value is
-        not found in one fo the configs, it will be represented by KEYNOTFOUND.
-        @param first:   Fist dictionary to diff.
-        @param second:  Second dicationary to diff.
-        @return diff:   Dict of Key => (first.val, second.val)
+    """ Return a dict of keys that differ with another config object.
+    If a value is not found in one fo the configs, it will be represented
+    by KEYNOTFOUND.
+    @param first:   Fist dictionary to diff.
+    @param second:  Second dicationary to diff.
+    @return diff:   Dict of Key => (first.val, second.val)
     """
     diff = {}
     # Check all keys in first dict
@@ -46,13 +46,13 @@ class Store(MutableMapping, OrderedDict):
                     if isinstance(v, dict):
                         v = Store(v, _dynamic=self._dynamic)
                     if type(v) is list:
-                        l = []
+                        ele = []
                         for i in v:
                             n = i
                             if type(i) is dict:
                                 n = Store(i, _dynamic=self._dynamic)
-                            l.append(n)
-                        v = l
+                            ele.append(n)
+                        v = ele
                     self._map[k] = v
         if kwargs:
             for k, v in self.__call_items(kwargs):
@@ -78,19 +78,22 @@ class Store(MutableMapping, OrderedDict):
         self._map[k] = v
 
     def __getitem__(self, k):
-        if k not in self._map and self._dynamic and k != '_ipython_canary_method_should_not_exist_':
+        if k not in self._map and \
+           self._dynamic and k != '_ipython_canary_method_should_not_exist_':
             # automatically extend to new Store
             self[k] = Store()
         return self._map[k]
 
     def __setattr__(self, k, v):
-        if k in {'_map', '_dynamic', '_ipython_canary_method_should_not_exist_'}:
+        if k in {'_map', '_dynamic',
+                 '_ipython_canary_method_should_not_exist_'}:
             super(Store, self).__setattr__(k, v)
         else:
             self[k] = v
 
     def __getattr__(self, k):
-        if k == {'_map', '_dynamic', '_ipython_canary_method_should_not_exist_'}:
+        if k == {'_map', '_dynamic',
+                 '_ipython_canary_method_should_not_exist_'}:
             super(Store, self).__getattr__(k)
         else:
             return self[k]
@@ -104,7 +107,6 @@ class Store(MutableMapping, OrderedDict):
     def __str__(self):
         items = []
         for k, v in self.__call_items(self._map):
-            # bizarre recursive assignment situation (why someone would do this is beyond me)
             if id(v) == id(self):
                 items.append('{0}=Store(...)'.format(k))
             else:

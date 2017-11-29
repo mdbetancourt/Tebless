@@ -49,7 +49,7 @@ class Menu(Widget):
         self._is_menu = kwargs.get('is_menu', True)
         self._limit = round(kwargs.get('limit', 4))
 
-        if not 'width' in kwargs:
+        if 'width' not in kwargs:
             self._width = self.term.width
 
         self._header = kwargs.get('header', '')

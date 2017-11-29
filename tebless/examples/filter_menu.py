@@ -25,7 +25,9 @@ def main():
             'validation': r'\d'
         }, {
             'cordy': 1,
-            'items': ['Valor {:04d}'.format(randint(0, 1000)) for x in range(10000)],
+            'items': [
+                'Valor {:04d}'.format(randint(0, 1000)) for x in range(10000)
+            ],
             'header': 'Lista',
             'footer': '{page}/{last}, Total: {count}',
             'on_enter': change
