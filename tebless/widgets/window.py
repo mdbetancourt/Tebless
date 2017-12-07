@@ -22,7 +22,8 @@ from tebless.utils.keyboard import KEY_ENTER, KEY_ESCAPE, KEY_DOWN, KEY_UP
 
 
 class Window(Widget):
-    """Class that encapsulates a whole window and allows to own the elements inside.
+    """Class that encapsulates a whole window and allows to own the elements
+    inside.
 
     :param store: Global storage is necessary
     :param parent: If you do not provider it is the main window

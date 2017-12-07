@@ -3,7 +3,7 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 import functools
-from tebless.utils.styles import red, white, underline_ns
+from tebless.utils.styles import red, underline_ns
 from tebless.devs.decorators import theme
 __all__ = ['single', 'double']
 
@@ -97,6 +97,6 @@ def double(window, config):
     return {
         'header': header,
         'footer': footer,
-        'formater': lambda text, **kwargs: f'{l_eq} {for_s(text)}',
-        'selector': lambda text, **kwargs: f'{l_eq} {underline_ns(for_s(text))}',
+        'formater': lambda text, **_: f'{l_eq} {for_s(text)}',
+        'selector': lambda text, **_: f'{l_eq} {underline_ns(for_s(text))}',
     }

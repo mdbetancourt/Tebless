@@ -4,17 +4,17 @@ Tebless
 
 
 .. image:: https://img.shields.io/pypi/v/tebless.svg
-        :target: https://pypi.python.org/pypi/tebless
+     :target: https://pypi.python.org/pypi/tebless
 
 .. image:: https://img.shields.io/travis/akhail/tebless.svg
-        :target: https://travis-ci.org/akhail/tebless
+     :target: https://travis-ci.org/akhail/tebless
 
 .. image:: https://readthedocs.org/projects/tebless/badge/?version=latest
-        :target: https://tebless.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+     :target: http://tebless.readthedocs.io/en/latest/?badge=latest
+     :alt: Documentation Status
 
-.. image:: https://pyup.io/repos/github/akhail/tebless/shield.svg
-     :target: https://pyup.io/repos/github/akhail/tebless/
+.. image:: https://pyup.io/repos/github/Akhail/Tebless/shield.svg
+     :target: https://pyup.io/repos/github/Akhail/Tebless/
      :alt: Updates
 
 

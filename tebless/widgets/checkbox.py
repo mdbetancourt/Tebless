@@ -25,7 +25,8 @@ class CheckBox(Widget):
 
     def paint(self):
         echo(self.term.move(self.y, self.x))
-        echo(self._render.format(check=self._check(self._state), label=self._label))
+        echo(self._render.format(check=self._check(self._state),
+                                 label=self._label))
 
     def _on_key(self, key):
         if key.code == self._key:

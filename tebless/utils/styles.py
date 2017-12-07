@@ -15,7 +15,8 @@ TERM = blessed.Terminal()
 class Style(object):
     def __getattr__(self, name):
         formatters = blessed.formatters.split_compound(name)
-        compoundables, colors = blessed.formatters.COMPOUNDABLES, blessed.formatters.COLORS
+        compoundables = blessed.formatters.COMPOUNDABLES
+        colors = blessed.formatters.COLORS
         if name in colors or all(fmt in compoundables for fmt in formatters):
             return TERM.__getattr__(name)
         else:

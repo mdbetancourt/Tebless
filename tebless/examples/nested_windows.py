@@ -1,6 +1,6 @@
 from tebless.devs import init_debug
 from tebless.utils import Store
-from tebless.widgets import Window, Input, FilterMenu, Label
+from tebless.widgets import Window, Input,  Label
 
 _store = Store()
 

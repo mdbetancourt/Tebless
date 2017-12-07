@@ -3,12 +3,9 @@
 # This software is released under the MIT License.
 # https://opensource.org/licenses/MIT
 
-import logging
-from functools import partial
-from copy import copy
 from events import Events
 from blessed import Terminal
-from tebless.utils import Store, dict_diff
+from tebless.utils import Store
 from tebless.devs import echo, Debug
 
 
