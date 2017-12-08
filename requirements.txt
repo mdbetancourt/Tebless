@@ -1,2 +1,2 @@
-blessed
+blessed==1.14.2
 git+https://github.com/Akhail/events.git#egg=events
