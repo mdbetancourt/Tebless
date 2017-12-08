@@ -210,6 +210,8 @@ class Store(MutableMapping, OrderedDict):
         d._map = OrderedDict.fromkeys(seq, value)
         return d
 
-    def __getstate__(self): return self.__dict__
+    def __getstate__(self):
+        return self.__dict__
 
-    def __setstate__(self, d): self.__dict__.update(d)
+    def __setstate__(self, d):
+        self.__dict__.update(d)

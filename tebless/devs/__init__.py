@@ -5,10 +5,10 @@
 
 import functools
 
+__all__ = ['Widget', 'init_debug', 'Debug', 'echo']
 
-from ._debug import init_debug, Debug
-from ._widget import Widget
 
 echo = functools.partial(print, end='', flush=True)
 
-__all__ = ['Widget', 'init_debug', 'Debug']
+from ._debug import init_debug, Debug
+from ._widget import Widget
