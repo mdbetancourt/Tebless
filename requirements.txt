@@ -1,2 +1,2 @@
 blessed
-git+https://github.com/Akhail/events.git#egg=events
+git+https://github.com/mdbetancourt/events.git#egg=events
